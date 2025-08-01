@@ -24,6 +24,8 @@ export const getCategorySpecs = async (categoryID: string) => {
                 id: true,
                 title: true,
                 specs: true,
+                createdAt: true,
+                updatedAt: true,
               },
             },
           },

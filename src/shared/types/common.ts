@@ -1,4 +1,10 @@
-import { NameValue, OptionSetType, PageType } from "@prisma/client";
+import { OptionSetType, PageType } from "@prisma/client";
+
+// Define NameValue type since it's not exported from Prisma anymore
+export type NameValue = {
+  name: string;
+  value: string;
+};
 
 export type TProductCard = {
   name: string;

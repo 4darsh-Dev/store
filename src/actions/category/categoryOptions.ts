@@ -4,7 +4,7 @@ import { OptionSetType } from "@prisma/client";
 import { z } from "zod";
 
 import { db } from "@/shared/lib/db";
-import { TOptionSet, TSingleOption, TSingleSpec, TSpecGroup } from "@/shared/types/common";
+import { TOptionSet, TSingleOption, TSingleSpec, TSpecGroup, NameValue } from "@/shared/types/common";
 
 const AddOptionSet = z.object({
   name: z.string().min(3),
@@ -30,7 +30,7 @@ export const getOptionSetByCatID = async (categoryID: string) => {
   if (!categoryID || categoryID === "") return { error: "Invalid Data!" };
 
   try {
-    const result: TOptionSet[] = await db.optionSet.findMany({
+    const rawResult = await db.optionSet.findMany({
       where: {
         Category_Option: {
           some: {
@@ -40,7 +40,16 @@ export const getOptionSetByCatID = async (categoryID: string) => {
       },
     });
 
-    if (!result) return { error: "Not Found!" };
+    if (!rawResult) return { error: "Not Found!" };
+
+    // Convert JSON options to NameValue[] format
+    const result: TOptionSet[] = rawResult.map((optionSet) => ({
+      id: optionSet.id,
+      name: optionSet.name,
+      type: optionSet.type,
+      options: Array.isArray(optionSet.options) ? (optionSet.options as NameValue[]) : [],
+    }));
+
     return { res: result };
   } catch (error) {
     return { error: JSON.stringify(error) };
@@ -62,6 +71,7 @@ export const addOptionSet = async (data: TOptionSet) => {
               create: {
                 name: data.name,
                 type: data.type,
+                options: data.options,
               },
             },
           },

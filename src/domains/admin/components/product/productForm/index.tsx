@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductSpec, SpecGroup } from "@prisma/client";
+import { SpecGroup } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 import { getAllBrands } from "@/actions/brands/brands";
@@ -115,7 +115,7 @@ const ProductForm = ({ formValues: props, onChange }: TProps) => {
   const getSpecGroup = async (categoryID: string) => {
     const response = await getCategorySpecs(categoryID);
     if (response.res) {
-      const specArray: ProductSpec[] = [];
+      const specArray: any[] = [];
       response.res.forEach((item) => {
         specArray.push({
           specGroupID: item.id,

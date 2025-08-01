@@ -114,7 +114,7 @@ const getProductsByCategories = async (categories: string[], sortData: TListSort
   const isInitialPrice = filters.priceMinMax[1] === 0;
 
   try {
-    const result: TListItem[] | null = await db.product.findMany({
+    const rawResult = await db.product.findMany({
       where: {
         AND: [
           {
@@ -159,7 +159,15 @@ const getProductsByCategories = async (categories: string[], sortData: TListSort
         [sortData.sortName]: sortData.sortType,
       },
     });
-    if (!result) return null;
+    if (!rawResult) return null;
+
+    // Convert Decimal fields to numbers for Client Components
+    const result: TListItem[] = rawResult.map((product) => ({
+      ...product,
+      price: Number(product.price),
+      salePrice: product.salePrice ? Number(product.salePrice) : null,
+    }));
+
     return result;
   } catch {
     return null;

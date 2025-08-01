@@ -1,5 +1,4 @@
 "use server";
-import { ProductSpec } from "@prisma/client";
 import { z } from "zod";
 
 import { db } from "@/shared/lib/db";
@@ -108,7 +107,6 @@ export const getOneProduct = async (productID: string) => {
         specs: true,
         specialFeatures: true,
         isAvailable: true,
-        optionSets: true,
         category: {
           select: {
             id: true,
@@ -119,7 +117,7 @@ export const getOneProduct = async (productID: string) => {
     });
     if (!result) return { error: "Invalid Data!" };
 
-    const specifications = await generateSpecTable(result.specs);
+    const specifications = await generateSpecTable(result.specs as any);
     if (!specifications || specifications.length === 0) return { error: "Invalid Date" };
 
     const pathArray: TPath[] | null = await getPathByCategoryID(result.category.id, result.category.parentID);
@@ -129,6 +127,9 @@ export const getOneProduct = async (productID: string) => {
     const { specs, ...others } = result;
     const mergedResult: TProductPageInfo = {
       ...others,
+      price: Number(others.price),
+      salePrice: others.salePrice ? Number(others.salePrice) : null,
+      optionSets: [], // Empty array since optionSets aren't implemented yet
       specifications,
       path: pathArray,
     };
@@ -143,7 +144,7 @@ export const getCartProducts = async (productIDs: string[]) => {
   if (!productIDs || productIDs.length === 0) return { error: "Invalid Product List" };
 
   try {
-    const result: TCartListItemDB[] | null = await db.product.findMany({
+    const rawResult = await db.product.findMany({
       where: {
         id: { in: productIDs },
       },
@@ -156,7 +157,15 @@ export const getCartProducts = async (productIDs: string[]) => {
       },
     });
 
-    if (!result) return { error: "Can't Get Data from Database!" };
+    if (!rawResult) return { error: "Can't Get Data from Database!" };
+
+    // Convert Decimal fields to numbers for Client Components
+    const result: TCartListItemDB[] = rawResult.map((product) => ({
+      ...product,
+      price: Number(product.price),
+      salePrice: product.salePrice ? Number(product.salePrice) : null,
+    }));
+
     return { res: result };
   } catch (error) {
     return { error: JSON.stringify(error) };
@@ -179,38 +188,44 @@ export const deleteProduct = async (productID: string) => {
   }
 };
 
-const generateSpecTable = async (rawSpec: ProductSpec[]) => {
+const generateSpecTable = async (rawSpec: any): Promise<TSpecification[] | null> => {
   try {
-    const specGroupIDs = rawSpec.map((spec) => spec.specGroupID);
-
-    const result = await db.specGroup.findMany({
-      where: {
-        id: { in: specGroupIDs },
-      },
-    });
-    if (!result || result.length === 0) return null;
+    if (!rawSpec || typeof rawSpec !== "object") return null;
 
     const specifications: TSpecification[] = [];
 
-    rawSpec.forEach((spec) => {
-      const groupSpecIndex = result.findIndex((g) => g.id === spec.specGroupID);
-      const tempSpecs: { name: string; value: string }[] = [];
-      spec.specValues.forEach((s, index) => {
-        tempSpecs.push({
-          name: result[groupSpecIndex].specs[index] || "",
-          value: s || "",
+    // Convert JSON specs to the expected format
+    Object.entries(rawSpec).forEach(([groupName, groupSpecs]) => {
+      if (typeof groupSpecs === "object" && groupSpecs !== null) {
+        const specs: { name: string; value: string }[] = [];
+        Object.entries(groupSpecs).forEach(([key, value]) => {
+          specs.push({
+            name: key,
+            value: String(value),
+          });
         });
-      });
 
-      specifications.push({
-        groupName: result[groupSpecIndex].title || "",
-        specs: tempSpecs,
-      });
+        specifications.push({
+          groupName: groupName.charAt(0).toUpperCase() + groupName.slice(1), // Capitalize first letter
+          specs,
+        });
+      } else if (Array.isArray(groupSpecs)) {
+        // Handle array format (like features)
+        const specs: { name: string; value: string }[] = groupSpecs.map((feature, index) => ({
+          name: `Feature ${index + 1}`,
+          value: String(feature),
+        }));
+
+        specifications.push({
+          groupName: groupName.charAt(0).toUpperCase() + groupName.slice(1),
+          specs,
+        });
+      }
     });
-    if (specifications.length === 0) return null;
 
-    return specifications;
-  } catch {
+    return specifications.length > 0 ? specifications : null;
+  } catch (error) {
+    console.error("Error generating spec table:", error);
     return null;
   }
 };
