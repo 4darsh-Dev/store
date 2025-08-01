@@ -6,27 +6,34 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Category {
   id       String  @id @default(cuid())
   parentID String?
 
-  name               String
-  url                String  @unique
-  iconUrl            String?
-  iconSize           Int[]
+  name     String
+  url      String  @unique
+  iconUrl  String?
+  iconSize Int[]
+
+  // Self-referencing relations for category hierarchy
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentID], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
   Category_Option    Category_OptionSet[]
   Category_SpecGroup Category_SpecGroup[]
   products           Product[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([name])
   @@index([url])
+  @@index([parentID])
 }
 
 model Category_OptionSet {
@@ -34,7 +41,7 @@ model Category_OptionSet {
 
   option     OptionSet @relation(fields: [optionID], references: [id], onDelete: Cascade)
   optionID   String
-  category   Category  @relation(fields: [categoryID], references: [id])
+  category   Category  @relation(fields: [categoryID], references: [id], onDelete: Cascade)
   categoryID String
 
   @@unique([optionID, categoryID])
@@ -46,7 +53,8 @@ model OptionSet {
   options         Json // PostgreSQL JSON type for flexibility
   type            OptionSetType
   Category_Option Category_OptionSet[]
-  
+  productOptions  ProductOptionSet[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -58,7 +66,7 @@ model Category_SpecGroup {
 
   specGroup   SpecGroup @relation(fields: [specGroupID], references: [id], onDelete: Cascade)
   specGroupID String
-  category    Category  @relation(fields: [categoryID], references: [id])
+  category    Category  @relation(fields: [categoryID], references: [id], onDelete: Cascade)
   categoryID  String
 
   @@unique([specGroupID, categoryID])
@@ -69,7 +77,7 @@ model SpecGroup {
   title              String
   specs              String[]
   Category_SpecGroup Category_SpecGroup[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -80,27 +88,28 @@ enum OptionSetType {
 }
 
 model Product {
-  id              String        @id @default(cuid())
+  id              String      @id @default(cuid())
   name            String
-  isAvailable     Boolean       @default(true)
+  isAvailable     Boolean     @default(true)
   desc            String?
   specialFeatures String[]
   images          String[]
-  category        Category      @relation(fields: [categoryID], references: [id])
+  category        Category    @relation(fields: [categoryID], references: [id], onDelete: Restrict)
   categoryID      String
-  optionSets      String[] // Array of option set IDs
-  price           Float
-  salePrice       Float?
+  price           Decimal     @db.Decimal(10, 2)
+  salePrice       Decimal?    @db.Decimal(10, 2)
   specs           Json? // PostgreSQL JSON for product specifications
-  brand           Brand         @relation(fields: [brandID], references: [id])
+  brand           Brand       @relation(fields: [brandID], references: [id], onDelete: Restrict)
   brandID         String
   PageVisit       PageVisit[]
-  
+
+  // Many-to-many relation with OptionSet
+  productOptions ProductOptionSet[]
+
   // Search-related fields
-  searchVector    String? // For full-text search
-  sku             String? @unique
-  stock           Int?    @default(0)
-  
+  sku   String? @unique
+  stock Int?    @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -112,6 +121,20 @@ model Product {
   @@index([sku])
 }
 
+// Junction table for Product and OptionSet many-to-many relationship
+model ProductOptionSet {
+  id String @id @default(cuid())
+
+  product     Product   @relation(fields: [productID], references: [id], onDelete: Cascade)
+  productID   String
+  optionSet   OptionSet @relation(fields: [optionSetID], references: [id], onDelete: Cascade)
+  optionSetID String
+
+  selectedValue String? // The specific option value selected for this product
+
+  @@unique([productID, optionSetID])
+}
+
 // Remove ProductSpec type as we're using JSON
 
 model Brand {
@@ -119,7 +142,7 @@ model Brand {
   name     String    @unique
   logoUrl  String?
   products Product[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -127,14 +150,14 @@ model Brand {
 }
 
 model PageVisit {
-  id               String    @id @default(cuid())
-  time             DateTime  @default(now())
+  id               String   @id @default(cuid())
+  time             DateTime @default(now())
   pageType         PageType
   pagePath         String?
   deviceResolution String?
   productID        String?
-  product          Product?  @relation(fields: [productID], references: [id])
-  
+  product          Product? @relation(fields: [productID], references: [id], onDelete: SetNull)
+
   @@index([time])
   @@index([pageType])
 }
@@ -166,14 +189,15 @@ model Account {
 }
 
 model User {
-  id             String    @id @default(cuid())
+  id             String      @id @default(cuid())
   name           String?
-  email          String?   @unique
+  email          String?     @unique
   emailVerified  DateTime?
   hashedPassword String?
   image          String?
   accounts       Account[]
-  
+  searchLogs     SearchLog[] // Relation to search logs
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -186,8 +210,10 @@ model SearchLog {
   query     String
   results   Int      @default(0)
   userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   timestamp DateTime @default(now())
 
   @@index([query])
   @@index([timestamp])
+  @@index([userId])
 }

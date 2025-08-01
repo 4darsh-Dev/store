@@ -1,297 +1,293 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Decimal, OptionSetType, PageType } from "@prisma/client";
 
-const prisma = new PrismaClient()
-
-// Sample data for seeding
-const sampleBrands = [
-  { name: 'Apple', logoUrl: '/brands/apple.png' },
-  { name: 'Samsung', logoUrl: '/brands/samsung.png' },
-  { name: 'Sony', logoUrl: '/brands/sony.png' },
-  { name: 'LG', logoUrl: '/brands/lg.png' },
-  { name: 'Dell', logoUrl: '/brands/dell.png' },
-  { name: 'HP', logoUrl: '/brands/hp.png' },
-  { name: 'Lenovo', logoUrl: '/brands/lenovo.png' },
-  { name: 'Nike', logoUrl: '/brands/nike.png' },
-  { name: 'Adidas', logoUrl: '/brands/adidas.png' },
-  { name: 'Canon', logoUrl: '/brands/canon.png' }
-]
-
-const sampleCategories = [
-  {
-    name: 'Electronics',
-    url: 'electronics',
-    iconUrl: '/categories/electronics.svg',
-    iconSize: [24, 24]
-  },
-  {
-    name: 'Smartphones',
-    url: 'smartphones',
-    iconUrl: '/categories/smartphones.svg',
-    iconSize: [24, 24]
-  },
-  {
-    name: 'Laptops',
-    url: 'laptops',
-    iconUrl: '/categories/laptops.svg',
-    iconSize: [24, 24]
-  },
-  {
-    name: 'Clothing',
-    url: 'clothing',
-    iconUrl: '/categories/clothing.svg',
-    iconSize: [24, 24]
-  },
-  {
-    name: 'Shoes',
-    url: 'shoes',
-    iconUrl: '/categories/shoes.svg',
-    iconSize: [24, 24]
-  },
-  {
-    name: 'Cameras',
-    url: 'cameras',
-    iconUrl: '/categories/cameras.svg',
-    iconSize: [24, 24]
-  }
-]
-
-const sampleOptionSets = [
-  {
-    name: 'Colors',
-    type: 'COLOR' as const,
-    options: [
-      { name: 'Black', value: '#000000' },
-      { name: 'White', value: '#FFFFFF' },
-      { name: 'Blue', value: '#0066CC' },
-      { name: 'Red', value: '#CC0000' },
-      { name: 'Silver', value: '#C0C0C0' }
-    ]
-  },
-  {
-    name: 'Storage',
-    type: 'TEXT' as const,
-    options: [
-      { name: '64GB', value: '64GB' },
-      { name: '128GB', value: '128GB' },
-      { name: '256GB', value: '256GB' },
-      { name: '512GB', value: '512GB' },
-      { name: '1TB', value: '1TB' }
-    ]
-  },
-  {
-    name: 'Size',
-    type: 'TEXT' as const,
-    options: [
-      { name: 'Small', value: 'S' },
-      { name: 'Medium', value: 'M' },
-      { name: 'Large', value: 'L' },
-      { name: 'Extra Large', value: 'XL' }
-    ]
-  }
-]
-
-const sampleSpecGroups = [
-  {
-    title: 'Technical Specifications',
-    specs: ['Display', 'Processor', 'RAM', 'Storage', 'Battery', 'OS']
-  },
-  {
-    title: 'Physical Specifications',
-    specs: ['Dimensions', 'Weight', 'Material', 'Colors Available']
-  },
-  {
-    title: 'Connectivity',
-    specs: ['WiFi', 'Bluetooth', 'USB', 'Ports', '5G']
-  }
-]
-
-// Generate sample products
-function generateSampleProducts(brands: any[], categories: any[]) {
-  const products = []
-  
-  const productTemplates = [
-    {
-      name: 'iPhone 15 Pro',
-      desc: 'Latest iPhone with A17 Pro chip and titanium design',
-      specialFeatures: ['A17 Pro Chip', 'Titanium Design', 'Pro Camera System'],
-      images: ['/products/iphone15pro-1.jpg', '/products/iphone15pro-2.jpg'],
-      price: 999.99,
-      salePrice: 899.99,
-      sku: 'IP15P-001'
-    },
-    {
-      name: 'MacBook Pro 16"',
-      desc: 'Powerful laptop for professionals with M3 chip',
-      specialFeatures: ['M3 Chip', 'Liquid Retina XDR Display', '22-hour battery'],
-      images: ['/products/macbook-pro-1.jpg', '/products/macbook-pro-2.jpg'],
-      price: 2499.99,
-      sku: 'MBP16-001'
-    },
-    {
-      name: 'Samsung Galaxy S24',
-      desc: 'AI-powered smartphone with advanced camera',
-      specialFeatures: ['AI Photography', '120Hz Display', '5G Ready'],
-      images: ['/products/galaxy-s24-1.jpg', '/products/galaxy-s24-2.jpg'],
-      price: 799.99,
-      salePrice: 749.99,
-      sku: 'SGS24-001'
-    },
-    {
-      name: 'Sony WH-1000XM5',
-      desc: 'Industry-leading noise canceling headphones',
-      specialFeatures: ['Noise Canceling', '30-hour Battery', 'Quick Charge'],
-      images: ['/products/sony-headphones-1.jpg', '/products/sony-headphones-2.jpg'],
-      price: 399.99,
-      sku: 'SWH1000-001'
-    },
-    {
-      name: 'Nike Air Max 270',
-      desc: 'Comfortable running shoes with Max Air unit',
-      specialFeatures: ['Max Air Unit', 'Lightweight', 'Breathable Mesh'],
-      images: ['/products/nike-airmax-1.jpg', '/products/nike-airmax-2.jpg'],
-      price: 149.99,
-      salePrice: 129.99,
-      sku: 'NAM270-001'
-    }
-  ]
-
-  productTemplates.forEach((template, index) => {
-    const brand = brands[index % brands.length]
-    const category = categories[index % categories.length]
-    
-    products.push({
-      ...template,
-      brandID: brand.id,
-      categoryID: category.id,
-      stock: Math.floor(Math.random() * 100) + 10,
-      specs: {
-        technical: {
-          brand: brand.name,
-          model: template.name,
-          warranty: '1 year'
-        }
-      },
-      searchVector: `${template.name} ${template.desc} ${brand.name} ${category.name}`.toLowerCase()
-    })
-  })
-
-  return products
-}
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed...')
+  console.log("🌱 Starting database seed...");
 
   try {
-    // Clear existing data
-    console.log('🧹 Clearing existing data...')
-    await prisma.searchLog.deleteMany()
-    await prisma.pageVisit.deleteMany()
-    await prisma.product.deleteMany()
-    await prisma.category_OptionSet.deleteMany()
-    await prisma.category_SpecGroup.deleteMany()
-    await prisma.optionSet.deleteMany()
-    await prisma.specGroup.deleteMany()
-    await prisma.category.deleteMany()
-    await prisma.brand.deleteMany()
-
-    // Seed brands
-    console.log('📦 Seeding brands...')
-    const brands = await Promise.all(
-      sampleBrands.map(brand =>
-        prisma.brand.create({ data: brand })
-      )
-    )
-    console.log(`✅ Created ${brands.length} brands`)
-
-    // Seed categories
-    console.log('📂 Seeding categories...')
-    const categories = await Promise.all(
-      sampleCategories.map(category =>
-        prisma.category.create({ data: category })
-      )
-    )
-    console.log(`✅ Created ${categories.length} categories`)
-
-    // Seed option sets
-    console.log('⚙️ Seeding option sets...')
-    const optionSets = await Promise.all(
-      sampleOptionSets.map(optionSet =>
-        prisma.optionSet.create({ data: optionSet })
-      )
-    )
-    console.log(`✅ Created ${optionSets.length} option sets`)
-
-    // Seed spec groups
-    console.log('📋 Seeding spec groups...')
-    const specGroups = await Promise.all(
-      sampleSpecGroups.map(specGroup =>
-        prisma.specGroup.create({ data: specGroup })
-      )
-    )
-    console.log(`✅ Created ${specGroups.length} spec groups`)
-
-    // Seed products
-    console.log('🛍️ Seeding products...')
-    const productsData = generateSampleProducts(brands, categories)
-    const products = await Promise.all(
-      productsData.map(product =>
-        prisma.product.create({ data: product })
-      )
-    )
-    console.log(`✅ Created ${products.length} products`)
-
-    // Create some category-option relationships
-    console.log('🔗 Creating category relationships...')
-    await Promise.all([
-      prisma.category_OptionSet.create({
-        data: {
-          categoryID: categories[0].id, // Electronics
-          optionID: optionSets[0].id    // Colors
-        }
-      }),
-      prisma.category_OptionSet.create({
-        data: {
-          categoryID: categories[1].id, // Smartphones
-          optionID: optionSets[1].id    // Storage
-        }
-      }),
-      prisma.category_SpecGroup.create({
-        data: {
-          categoryID: categories[0].id, // Electronics
-          specGroupID: specGroups[0].id // Technical Specifications
-        }
-      })
-    ])
-
-    console.log('🎉 Database seeded successfully!')
+    // Clear existing data in correct order
+    console.log("🧹 Clearing existing data...");
     
+    await prisma.pageVisit.deleteMany();
+    await prisma.productOptionSet.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.category_OptionSet.deleteMany();
+    await prisma.category_SpecGroup.deleteMany();
+    await prisma.optionSet.deleteMany();
+    await prisma.specGroup.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.brand.deleteMany();
+    
+    console.log("✅ Existing data cleared");
+
+    // Create brands one by one to avoid connection pool issues
+    console.log("📦 Creating brands...");
+    const apple = await prisma.brand.create({
+      data: { name: "Apple", logoUrl: "/brands/apple.png" }
+    });
+    const samsung = await prisma.brand.create({
+      data: { name: "Samsung", logoUrl: "/brands/samsung.png" }
+    });
+    const sony = await prisma.brand.create({
+      data: { name: "Sony", logoUrl: "/brands/sony.png" }
+    });
+    const nike = await prisma.brand.create({
+      data: { name: "Nike", logoUrl: "/brands/nike.png" }
+    });
+    
+    console.log(`✅ Created 4 brands`);
+
+    // Create categories
+    console.log("📂 Creating categories...");
+    const electronics = await prisma.category.create({
+      data: {
+        name: "Electronics",
+        url: "electronics",
+        iconUrl: "/categories/electronics.svg",
+        iconSize: [24, 24],
+      }
+    });
+    const smartphones = await prisma.category.create({
+      data: {
+        name: "Smartphones",
+        url: "smartphones",
+        iconUrl: "/categories/smartphones.svg",
+        iconSize: [24, 24],
+      }
+    });
+    const laptops = await prisma.category.create({
+      data: {
+        name: "Laptops",
+        url: "laptops",
+        iconUrl: "/categories/laptops.svg",
+        iconSize: [24, 24],
+      }
+    });
+    const shoes = await prisma.category.create({
+      data: {
+        name: "Shoes",
+        url: "shoes",
+        iconUrl: "/categories/shoes.svg",
+        iconSize: [24, 24],
+      }
+    });
+    
+    console.log(`✅ Created 4 categories`);
+
+    // Create option sets
+    console.log("⚙️ Creating option sets...");
+    const colorsOption = await prisma.optionSet.create({
+      data: {
+        name: "Colors",
+        type: OptionSetType.COLOR,
+        options: [
+          { name: "Black", value: "#000000" },
+          { name: "White", value: "#FFFFFF" },
+          { name: "Blue", value: "#0066CC" },
+          { name: "Red", value: "#CC0000" },
+        ],
+      }
+    });
+    
+    const storageOption = await prisma.optionSet.create({
+      data: {
+        name: "Storage",
+        type: OptionSetType.TEXT,
+        options: [
+          { name: "64GB", value: "64GB" },
+          { name: "128GB", value: "128GB" },
+          { name: "256GB", value: "256GB" },
+          { name: "512GB", value: "512GB" },
+        ],
+      }
+    });
+    
+    console.log(`✅ Created 2 option sets`);
+
+    // Create spec groups
+    console.log("📋 Creating spec groups...");
+    const techSpecs = await prisma.specGroup.create({
+      data: {
+        title: "Technical Specifications",
+        specs: ["Display", "Processor", "RAM", "Storage", "Battery"],
+      }
+    });
+    
+    console.log(`✅ Created 1 spec group`);
+
+    // Create products
+    console.log("🛍️ Creating products...");
+    
+    const iphone = await prisma.product.create({
+      data: {
+        name: "iPhone 15 Pro",
+        desc: "Latest iPhone with A17 Pro chip and titanium design",
+        specialFeatures: ["A17 Pro Chip", "Titanium Design", "Pro Camera System"],
+        images: ["/products/iphone15pro-1.jpg", "/products/iphone15pro-2.jpg"],
+        price: new Decimal("999.99"),
+        salePrice: new Decimal("899.99"),
+        sku: "IP15P-001",
+        brandID: apple.id,
+        categoryID: smartphones.id,
+        stock: 50,
+        specs: {
+          technical: {
+            brand: "Apple",
+            model: "iPhone 15 Pro",
+            warranty: "1 year",
+          },
+          features: ["A17 Pro Chip", "Titanium Design", "Pro Camera System"],
+        },
+      }
+    });
+    
+    const macbook = await prisma.product.create({
+      data: {
+        name: "MacBook Pro 16\"",
+        desc: "Powerful laptop for professionals with M3 chip",
+        specialFeatures: ["M3 Chip", "Liquid Retina XDR Display", "22-hour battery"],
+        images: ["/products/macbook-pro-1.jpg", "/products/macbook-pro-2.jpg"],
+        price: new Decimal("2499.99"),
+        sku: "MBP16-001",
+        brandID: apple.id,
+        categoryID: laptops.id,
+        stock: 25,
+        specs: {
+          technical: {
+            brand: "Apple",
+            model: "MacBook Pro 16\"",
+            warranty: "1 year",
+          },
+          features: ["M3 Chip", "Liquid Retina XDR Display", "22-hour battery"],
+        },
+      }
+    });
+    
+    const galaxy = await prisma.product.create({
+      data: {
+        name: "Samsung Galaxy S24",
+        desc: "AI-powered smartphone with advanced camera",
+        specialFeatures: ["AI Photography", "120Hz Display", "5G Ready"],
+        images: ["/products/galaxy-s24-1.jpg", "/products/galaxy-s24-2.jpg"],
+        price: new Decimal("799.99"),
+        salePrice: new Decimal("749.99"),
+        sku: "SGS24-001",
+        brandID: samsung.id,
+        categoryID: smartphones.id,
+        stock: 75,
+        specs: {
+          technical: {
+            brand: "Samsung",
+            model: "Galaxy S24",
+            warranty: "2 years",
+          },
+          features: ["AI Photography", "120Hz Display", "5G Ready"],
+        },
+      }
+    });
+    
+    const airmax = await prisma.product.create({
+      data: {
+        name: "Nike Air Max 270",
+        desc: "Comfortable running shoes with Max Air unit",
+        specialFeatures: ["Max Air Unit", "Lightweight", "Breathable Mesh"],
+        images: ["/products/nike-airmax-1.jpg", "/products/nike-airmax-2.jpg"],
+        price: new Decimal("149.99"),
+        salePrice: new Decimal("129.99"),
+        sku: "NAM270-001",
+        brandID: nike.id,
+        categoryID: shoes.id,
+        stock: 100,
+        specs: {
+          technical: {
+            brand: "Nike",
+            model: "Air Max 270",
+            warranty: "6 months",
+          },
+          features: ["Max Air Unit", "Lightweight", "Breathable Mesh"],
+        },
+      }
+    });
+    
+    console.log(`✅ Created 4 products`);
+
+    // Create relationships
+    console.log("🔗 Creating relationships...");
+    
+    // Category-Option relationships
+    await prisma.category_OptionSet.create({
+      data: {
+        categoryID: smartphones.id,
+        optionID: colorsOption.id,
+      }
+    });
+    
+    await prisma.category_OptionSet.create({
+      data: {
+        categoryID: smartphones.id,
+        optionID: storageOption.id,
+      }
+    });
+    
+    // Category-SpecGroup relationships
+    await prisma.category_SpecGroup.create({
+      data: {
+        categoryID: electronics.id,
+        specGroupID: techSpecs.id,
+      }
+    });
+    
+    // Product-Option relationships
+    await prisma.productOptionSet.create({
+      data: {
+        productID: iphone.id,
+        optionSetID: colorsOption.id,
+        selectedValue: "Black",
+      }
+    });
+    
+    await prisma.productOptionSet.create({
+      data: {
+        productID: iphone.id,
+        optionSetID: storageOption.id,
+        selectedValue: "256GB",
+      }
+    });
+    
+    console.log(`✅ Created relationships`);
+
+    console.log("🎉 Database seeded successfully!");
+
     // Print summary
     const counts = await Promise.all([
       prisma.brand.count(),
       prisma.category.count(),
       prisma.product.count(),
       prisma.optionSet.count(),
-      prisma.specGroup.count()
-    ])
-    
-    console.log('\n📊 Seed Summary:')
-    console.log(`   Brands: ${counts[0]}`)
-    console.log(`   Categories: ${counts[1]}`)
-    console.log(`   Products: ${counts[2]}`)
-    console.log(`   Option Sets: ${counts[3]}`)
-    console.log(`   Spec Groups: ${counts[4]}`)
+      prisma.specGroup.count(),
+      prisma.productOptionSet.count(),
+    ]);
+
+    console.log("\n📊 Seed Summary:");
+    console.log(`   Brands: ${counts[0]}`);
+    console.log(`   Categories: ${counts[1]}`);
+    console.log(`   Products: ${counts[2]}`);
+    console.log(`   Option Sets: ${counts[3]}`);
+    console.log(`   Spec Groups: ${counts[4]}`);
+    console.log(`   Product-Option Relations: ${counts[5]}`);
 
   } catch (error) {
-    console.error('❌ Error seeding database:', error)
-    throw error
+    console.error("❌ Error seeding database:", error);
+    throw error;
   }
 }
 
 main()
   .catch((e) => {
-    console.error(e)
-    process.exit(1)
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });
