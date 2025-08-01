@@ -1,0 +1,44 @@
+{
+  "brands": [
+    {
+      "name": "Apple",
+      "logoUrl": "/brands/apple.png"
+    },
+    {
+      "name": "Samsung",
+      "logoUrl": "/brands/samsung.png"
+    },
+    {
+      "name": "Sony",
+      "logoUrl": "/brands/sony.png"
+    },
+    {
+      "name": "Nike",
+      "logoUrl": "/brands/nike.png"
+    },
+    {
+      "name": "Dell",
+      "logoUrl": "/brands/dell.png"
+    },
+    {
+      "name": "HP",
+      "logoUrl": "/brands/hp.png"
+    },
+    {
+      "name": "Lenovo",
+      "logoUrl": "/brands/lenovo.png"
+    },
+    {
+      "name": "Google",
+      "logoUrl": "/brands/google.png"
+    },
+    {
+      "name": "Microsoft",
+      "logoUrl": "/brands/microsoft.png"
+    },
+    {
+      "name": "Canon",
+      "logoUrl": "/brands/canon.png"
+    }
+  ]
+}

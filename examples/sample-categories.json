@@ -1,0 +1,52 @@
+{
+  "categories": [
+    {
+      "name": "Electronics",
+      "url": "electronics",
+      "iconUrl": "/icons/electronics.svg",
+      "iconSize": [24, 24]
+    },
+    {
+      "name": "Smartphones",
+      "url": "smartphones",
+      "iconUrl": "/icons/smartphone.svg",
+      "iconSize": [24, 24]
+    },
+    {
+      "name": "Laptops",
+      "url": "laptops",
+      "iconUrl": "/icons/laptop.svg",
+      "iconSize": [24, 24]
+    },
+    {
+      "name": "Audio",
+      "url": "audio",
+      "iconUrl": "/icons/headphones.svg",
+      "iconSize": [24, 24]
+    },
+    {
+      "name": "Fashion",
+      "url": "fashion",
+      "iconUrl": "/icons/fashion.svg",
+      "iconSize": [24, 24]
+    },
+    {
+      "name": "Shoes",
+      "url": "shoes",
+      "iconUrl": "/icons/shoes.svg",
+      "iconSize": [24, 24]
+    },
+    {
+      "name": "Gaming",
+      "url": "gaming",
+      "iconUrl": "/icons/gaming.svg",
+      "iconSize": [24, 24]
+    },
+    {
+      "name": "Home & Garden",
+      "url": "home-garden",
+      "iconUrl": "/icons/home.svg",
+      "iconSize": [24, 24]
+    }
+  ]
+}

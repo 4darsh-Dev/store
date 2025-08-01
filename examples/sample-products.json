@@ -1,0 +1,196 @@
+{
+  "products": [
+    {
+      "name": "iPhone 15 Pro Max",
+      "desc": "The most advanced iPhone ever with titanium design and A17 Pro chip",
+      "specialFeatures": ["A17 Pro Chip", "Titanium Design", "Pro Camera System", "5G Ready"],
+      "images": [
+        "/products/iphone-15-pro-max-1.jpg",
+        "/products/iphone-15-pro-max-2.jpg",
+        "/products/iphone-15-pro-max-3.jpg"
+      ],
+      "price": 1199.99,
+      "salePrice": 1099.99,
+      "sku": "IP15PM-NAT-1TB",
+      "stock": 25,
+      "brandName": "Apple",
+      "categoryName": "Smartphones",
+      "specs": {
+        "display": "6.7-inch Super Retina XDR OLED",
+        "processor": "A17 Pro chip",
+        "storage": "1TB",
+        "camera": "48MP Main, 12MP Ultra Wide, 12MP Telephoto",
+        "battery": "Up to 29 hours video playback",
+        "os": "iOS 17",
+        "colors": ["Natural Titanium", "Blue Titanium", "White Titanium", "Black Titanium"]
+      },
+      "isAvailable": true
+    },
+    {
+      "name": "Samsung Galaxy S24 Ultra",
+      "desc": "AI-powered smartphone with S Pen and 200MP camera",
+      "specialFeatures": ["Galaxy AI", "S Pen", "200MP Camera", "120Hz Display"],
+      "images": [
+        "/products/galaxy-s24-ultra-1.jpg",
+        "/products/galaxy-s24-ultra-2.jpg"
+      ],
+      "price": 1299.99,
+      "salePrice": 1199.99,
+      "sku": "GS24U-TIT-512",
+      "stock": 30,
+      "brandName": "Samsung",
+      "categoryName": "Smartphones",
+      "specs": {
+        "display": "6.8-inch Dynamic AMOLED 2X",
+        "processor": "Snapdragon 8 Gen 3",
+        "storage": "512GB",
+        "camera": "200MP Main, 50MP Periscope Telephoto, 12MP Ultra Wide",
+        "battery": "5000mAh",
+        "os": "Android 14 with One UI 6.1"
+      },
+      "isAvailable": true
+    },
+    {
+      "name": "MacBook Pro 16-inch M3 Max",
+      "desc": "Supercharged for pros with M3 Max chip and Liquid Retina XDR display",
+      "specialFeatures": ["M3 Max Chip", "Liquid Retina XDR", "22-hour battery", "Studio-quality mics"],
+      "images": [
+        "/products/macbook-pro-16-m3-1.jpg",
+        "/products/macbook-pro-16-m3-2.jpg"
+      ],
+      "price": 3999.99,
+      "sku": "MBP16-M3MAX-1TB",
+      "stock": 15,
+      "brandName": "Apple",
+      "categoryName": "Laptops",
+      "specs": {
+        "display": "16.2-inch Liquid Retina XDR",
+        "processor": "Apple M3 Max chip",
+        "memory": "36GB unified memory",
+        "storage": "1TB SSD",
+        "graphics": "40-core GPU",
+        "battery": "Up to 22 hours",
+        "os": "macOS Sonoma"
+      },
+      "isAvailable": true
+    },
+    {
+      "name": "Sony WH-1000XM5 Wireless Headphones",
+      "desc": "Industry-leading noise canceling with exceptional sound quality",
+      "specialFeatures": ["Industry-leading noise canceling", "30-hour battery", "Multipoint connection", "Quick Charge"],
+      "images": [
+        "/products/sony-wh1000xm5-1.jpg",
+        "/products/sony-wh1000xm5-2.jpg"
+      ],
+      "price": 399.99,
+      "salePrice": 349.99,
+      "sku": "SXMH5-BLK",
+      "stock": 50,
+      "brandName": "Sony",
+      "categoryName": "Audio",
+      "specs": {
+        "type": "Over-ear wireless",
+        "driver": "30mm",
+        "frequency": "4Hz-40,000Hz",
+        "battery": "Up to 30 hours",
+        "charging": "USB-C, Quick charge 3 min = 3 hours",
+        "connectivity": "Bluetooth 5.2, multipoint"
+      },
+      "isAvailable": true
+    },
+    {
+      "name": "Nike Air Jordan 1 Retro High OG",
+      "desc": "Iconic basketball shoe with premium leather and classic colorway",
+      "specialFeatures": ["Premium leather", "Air-Sole unit", "Rubber outsole", "Classic design"],
+      "images": [
+        "/products/air-jordan-1-1.jpg",
+        "/products/air-jordan-1-2.jpg"
+      ],
+      "price": 170.00,
+      "sku": "AJ1-CHI-10",
+      "stock": 40,
+      "brandName": "Nike",
+      "categoryName": "Shoes",
+      "specs": {
+        "type": "High-top basketball shoe",
+        "material": "Premium leather upper",
+        "sole": "Rubber outsole with pivot point",
+        "cushioning": "Air-Sole unit in heel",
+        "sizes": ["7", "8", "9", "10", "11", "12", "13"]
+      },
+      "isAvailable": true
+    },
+    {
+      "name": "Dell XPS 13 Plus",
+      "desc": "Ultra-thin laptop with stunning 13.4-inch InfinityEdge display",
+      "specialFeatures": ["InfinityEdge Display", "12th Gen Intel", "Premium Carbon Fiber", "Thunderbolt 4"],
+      "images": [
+        "/products/dell-xps-13-plus-1.jpg",
+        "/products/dell-xps-13-plus-2.jpg"
+      ],
+      "price": 1299.99,
+      "salePrice": 1199.99,
+      "sku": "DXP13-I7-512",
+      "stock": 20,
+      "brandName": "Dell",
+      "categoryName": "Laptops",
+      "specs": {
+        "display": "13.4-inch OLED InfinityEdge",
+        "processor": "12th Gen Intel Core i7",
+        "memory": "16GB LPDDR5",
+        "storage": "512GB SSD",
+        "graphics": "Intel Iris Xe",
+        "battery": "Up to 12 hours",
+        "os": "Windows 11 Pro"
+      },
+      "isAvailable": true
+    },
+    {
+      "name": "Google Pixel 8 Pro",
+      "desc": "AI-powered photography with the most helpful Pixel ever",
+      "specialFeatures": ["Google AI", "Magic Eraser", "Call Screen", "7 years of updates"],
+      "images": [
+        "/products/pixel-8-pro-1.jpg",
+        "/products/pixel-8-pro-2.jpg"
+      ],
+      "price": 999.99,
+      "salePrice": 899.99,
+      "sku": "GP8P-OBS-256",
+      "stock": 35,
+      "brandName": "Google",
+      "categoryName": "Smartphones",
+      "specs": {
+        "display": "6.7-inch LTPO OLED",
+        "processor": "Google Tensor G3",
+        "storage": "256GB",
+        "camera": "50MP Main, 48MP Ultra Wide, 48MP Telephoto",
+        "battery": "5050mAh",
+        "os": "Android 14"
+      },
+      "isAvailable": true
+    },
+    {
+      "name": "Canon EOS R5",
+      "desc": "Professional mirrorless camera with 45MP full-frame sensor",
+      "specialFeatures": ["45MP Full-Frame", "8K Video", "In-Body Stabilization", "Dual Pixel AF"],
+      "images": [
+        "/products/canon-eos-r5-1.jpg",
+        "/products/canon-eos-r5-2.jpg"
+      ],
+      "price": 3899.99,
+      "sku": "CER5-BODY",
+      "stock": 10,
+      "brandName": "Canon",
+      "categoryName": "Electronics",
+      "specs": {
+        "sensor": "45MP Full-Frame CMOS",
+        "video": "8K RAW 30fps, 4K 120fps",
+        "stabilization": "In-Body Image Stabilization",
+        "autofocus": "Dual Pixel CMOS AF II",
+        "storage": "CFexpress Type B + SD",
+        "battery": "LP-E6NH"
+      },
+      "isAvailable": true
+    }
+  ]
+}
