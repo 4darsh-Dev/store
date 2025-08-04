@@ -89,8 +89,64 @@ export const getAllProducts = async () => {
   }
 };
 
+// export const getOneProduct = async (productID: string) => {
+//   if (!productID || productID === "") return { error: "Invalid Product ID!" };
+
+//   try {
+//     const result = await db.product.findFirst({
+//       where: {
+//         id: productID,
+//       },
+//       select: {
+//         id: true,
+//         name: true,
+//         desc: true,
+//         images: true,
+//         price: true,
+//         salePrice: true,
+//         specs: true,
+//         specialFeatures: true,
+//         isAvailable: true,
+//         category: {
+//           select: {
+//             id: true,
+//             parentID: true,
+//           },
+//         },
+//       },
+//     });
+//     if (!result) return { error: "Invalid Data!" };
+
+//     const specifications = await generateSpecTable(result.specs as any);
+//     if (!specifications || specifications.length === 0) return { error: "Invalid Date" };
+
+//     const pathArray: TPath[] | null = await getPathByCategoryID(result.category.id, result.category.parentID);
+//     if (!pathArray || pathArray.length === 0) return { error: "Invalid Date" };
+
+//     //eslint-disable-next-line
+//     const { specs, ...others } = result;
+//     const mergedResult: TProductPageInfo = {
+//       ...others,
+//       price: Number(others.price),
+//       salePrice: others.salePrice ? Number(others.salePrice) : null,
+//       optionSets: [], // Empty array since optionSets aren't implemented yet
+//       specifications,
+//       path: pathArray,
+//     };
+
+//     return { res: mergedResult };
+//   } catch (error) {
+//     return { error: JSON.stringify(error) };
+//   }
+// };
+
 export const getOneProduct = async (productID: string) => {
-  if (!productID || productID === "") return { error: "Invalid Product ID!" };
+  console.log("getOneProduct called with productID:", productID);
+  
+  if (!productID || productID === "") {
+    console.log("Invalid product ID provided");
+    return { error: "Invalid Product ID!" };
+  }
 
   try {
     const result = await db.product.findFirst({
@@ -115,14 +171,30 @@ export const getOneProduct = async (productID: string) => {
         },
       },
     });
-    if (!result) return { error: "Invalid Data!" };
+    
+    console.log("Database result:", result);
+    
+    if (!result) {
+      console.log("No product found in database");
+      return { error: "Product not found!" };
+    }
 
+    console.log("Product found, generating specifications...");
     const specifications = await generateSpecTable(result.specs as any);
-    if (!specifications || specifications.length === 0) return { error: "Invalid Date" };
+    if (!specifications || specifications.length === 0) {
+      console.log("Failed to generate specifications");
+      return { error: "Invalid specifications data" };
+    }
 
+    console.log("Specifications generated, getting path...");
     const pathArray: TPath[] | null = await getPathByCategoryID(result.category.id, result.category.parentID);
-    if (!pathArray || pathArray.length === 0) return { error: "Invalid Date" };
+    if (!pathArray || pathArray.length === 0) {
+      console.log("Failed to get category path");
+      return { error: "Invalid category path" };
+    }
 
+    console.log("Path generated successfully");
+    
     //eslint-disable-next-line
     const { specs, ...others } = result;
     const mergedResult: TProductPageInfo = {
@@ -134,11 +206,14 @@ export const getOneProduct = async (productID: string) => {
       path: pathArray,
     };
 
+    console.log("Final result prepared:", mergedResult);
     return { res: mergedResult };
   } catch (error) {
-    return { error: JSON.stringify(error) };
+    console.error("Database error in getOneProduct:", error);
+    return { error: `Database error: ${error}` };
   }
 };
+
 
 export const getCartProducts = async (productIDs: string[]) => {
   if (!productIDs || productIDs.length === 0) return { error: "Invalid Product List" };
@@ -233,7 +308,23 @@ const generateSpecTable = async (rawSpec: any): Promise<TSpecification[] | null>
 const getPathByCategoryID = async (categoryID: string, parentID: string | null) => {
   try {
     if (!categoryID || categoryID === "") return null;
-    if (!parentID || parentID === "") return null;
+    
+    // For root categories (parentID is null), just return the category itself
+    if (!parentID) {
+      const rootCategory = await db.category.findFirst({
+        where: { id: categoryID },
+        select: {
+          id: true,
+          parentID: true,
+          name: true,
+          url: true,
+        },
+      });
+      
+      return rootCategory ? [rootCategory] : null;
+    }
+    
+    // For categories with parents, use the existing logic
     const result: TPath[] = await db.category.findMany({
       where: {
         OR: [{ id: categoryID }, { id: parentID }, { parentID: null }],
@@ -245,6 +336,7 @@ const getPathByCategoryID = async (categoryID: string, parentID: string | null) 
         url: true,
       },
     });
+    
     if (!result || result.length === 0) return null;
 
     const path: TPath[] = [];
@@ -263,9 +355,9 @@ const getPathByCategoryID = async (categoryID: string, parentID: string | null) 
     };
     generatePath();
 
-    if (!path || path.length === 0) return null;
-    return path;
-  } catch {
+    return path.length > 0 ? path : null;
+  } catch (error) {
+    console.error("Error in getPathByCategoryID:", error);
     return null;
   }
 };

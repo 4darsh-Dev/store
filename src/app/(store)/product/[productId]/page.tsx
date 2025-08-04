@@ -16,18 +16,46 @@ import { TProductPageInfo } from "@/shared/types/product";
 
 const ProductPage = () => {
   const router = useRouter();
-  const { productId } = useParams<{ productId: string[] }>();
+  // const { productId } = useParams<{ productId: string[] }>();
+  const { productId } = useParams<{ productId: string }>(); // Change from string[] to string
   const [productInfo, setProductInfo] = useState<TProductPageInfo | null | undefined>(null);
-  if (!productId) router.push("/");
+  // if (!productId) router.push("/");
 
   useEffect(() => {
-    const getProductFromDB = async () => {
-      const response = await getOneProduct(productId.toString());
-      if (response.error) router.push("/");
+  if (!productId) {
+    console.log("No productId found, redirecting to home");
+    router.push("/");
+    return;
+  }
+
+  const getProductFromDB = async () => {
+    try {
+      console.log("Fetching product with ID:", productId);
+      const response = await getOneProduct(productId);
+      console.log("getOneProduct response:", response);
+      
+      if (response.error) {
+        console.error("API returned error:", response.error);
+        router.push("/");
+        return;
+      }
+      
+      if (!response.res) {
+        console.log("No product data in response");
+        router.push("/");
+        return;
+      }
+      
+      console.log("Setting product info:", response.res);
       setProductInfo(response.res);
-    };
-    getProductFromDB();
-  }, [productId, router]);
+    } catch (error) {
+      console.error("Exception in getProductFromDB:", error);
+      router.push("/");
+    }
+  };
+  
+  getProductFromDB();
+}, [productId, router]);
 
   if (productInfo === undefined) return "";
   let fullPath = "";
