@@ -3,37 +3,37 @@
     {
       "name": "Electronics",
       "url": "electronics",
-      "iconUrl": "/icons/electronics.svg",
+      "iconUrl": "/computerIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Smartphones",
       "url": "smartphones",
-      "iconUrl": "/icons/smartphone.svg",
+      "iconUrl": "/phoneIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Laptops",
       "url": "laptops",
-      "iconUrl": "/icons/laptop.svg",
+      "iconUrl": "/computerIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Audio",
       "url": "audio",
-      "iconUrl": "/icons/headphones.svg",
+      "iconUrl": "/musicIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Fashion",
       "url": "fashion",
-      "iconUrl": "/icons/fashion.svg",
+      "iconUrl": "/otherCatIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Shoes",
       "url": "shoes",
-      "iconUrl": "/icons/shoes.svg",
+      "iconUrl": "/otherCatIcon.svg",
       "iconSize": [24, 24]
     },
     {

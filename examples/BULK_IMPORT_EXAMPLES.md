@@ -39,10 +39,7 @@ This directory contains example scripts for bulk importing data into your e-comm
       "name": "Samsung Galaxy S24 Ultra",
       "desc": "AI-powered smartphone with S Pen and 200MP camera",
       "specialFeatures": ["Galaxy AI", "S Pen", "200MP Camera", "120Hz Display"],
-      "images": [
-        "/products/galaxy-s24-ultra-1.jpg",
-        "/products/galaxy-s24-ultra-2.jpg"
-      ],
+      "images": ["/products/galaxy-s24-ultra-1.jpg", "/products/galaxy-s24-ultra-2.jpg"],
       "price": 1299.99,
       "salePrice": 1199.99,
       "sku": "GS24U-TIT-512",
@@ -63,10 +60,7 @@ This directory contains example scripts for bulk importing data into your e-comm
       "name": "MacBook Pro 16-inch M3 Max",
       "desc": "Supercharged for pros with M3 Max chip and Liquid Retina XDR display",
       "specialFeatures": ["M3 Max Chip", "Liquid Retina XDR", "22-hour battery", "Studio-quality mics"],
-      "images": [
-        "/products/macbook-pro-16-m3-1.jpg",
-        "/products/macbook-pro-16-m3-2.jpg"
-      ],
+      "images": ["/products/macbook-pro-16-m3-1.jpg", "/products/macbook-pro-16-m3-2.jpg"],
       "price": 3999.99,
       "sku": "MBP16-M3MAX-1TB",
       "stock": 15,
@@ -86,11 +80,13 @@ This directory contains example scripts for bulk importing data into your e-comm
     {
       "name": "Sony WH-1000XM5 Wireless Headphones",
       "desc": "Industry-leading noise canceling with exceptional sound quality",
-      "specialFeatures": ["Industry-leading noise canceling", "30-hour battery", "Multipoint connection", "Quick Charge"],
-      "images": [
-        "/products/sony-wh1000xm5-1.jpg",
-        "/products/sony-wh1000xm5-2.jpg"
+      "specialFeatures": [
+        "Industry-leading noise canceling",
+        "30-hour battery",
+        "Multipoint connection",
+        "Quick Charge"
       ],
+      "images": ["/products/sony-wh1000xm5-1.jpg", "/products/sony-wh1000xm5-2.jpg"],
       "price": 399.99,
       "salePrice": 349.99,
       "sku": "SXMH5-BLK",
@@ -111,11 +107,8 @@ This directory contains example scripts for bulk importing data into your e-comm
       "name": "Nike Air Jordan 1 Retro High OG",
       "desc": "Iconic basketball shoe with premium leather and classic colorway",
       "specialFeatures": ["Premium leather", "Air-Sole unit", "Rubber outsole", "Classic design"],
-      "images": [
-        "/products/air-jordan-1-1.jpg",
-        "/products/air-jordan-1-2.jpg"
-      ],
-      "price": 170.00,
+      "images": ["/products/air-jordan-1-1.jpg", "/products/air-jordan-1-2.jpg"],
+      "price": 170.0,
       "sku": "AJ1-CHI-10",
       "stock": 40,
       "brandName": "Nike",
@@ -141,37 +134,37 @@ This directory contains example scripts for bulk importing data into your e-comm
     {
       "name": "Electronics",
       "url": "electronics",
-      "iconUrl": "/icons/electronics.svg",
+      "iconUrl": "/computerIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Smartphones",
-      "url": "smartphones", 
-      "iconUrl": "/icons/smartphone.svg",
+      "url": "smartphones",
+      "iconUrl": "/phoneIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Laptops",
       "url": "laptops",
-      "iconUrl": "/icons/laptop.svg", 
+      "iconUrl": "/computerIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Audio",
       "url": "audio",
-      "iconUrl": "/icons/headphones.svg",
+      "iconUrl": "/musicIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Fashion",
       "url": "fashion",
-      "iconUrl": "/icons/fashion.svg",
+      "iconUrl": "/otherCatIcon.svg",
       "iconSize": [24, 24]
     },
     {
       "name": "Shoes",
       "url": "shoes",
-      "iconUrl": "/icons/shoes.svg",
+      "iconUrl": "/otherCatIcon.svg",
       "iconSize": [24, 24]
     },
     {
@@ -214,7 +207,7 @@ This directory contains example scripts for bulk importing data into your e-comm
       "logoUrl": "/brands/hp.png"
     },
     {
-      "name": "Lenovo", 
+      "name": "Lenovo",
       "logoUrl": "/brands/lenovo.png"
     },
     {
@@ -239,43 +232,43 @@ This directory contains example scripts for bulk importing data into your e-comm
 
 ```javascript
 // bulk-import.js
-const fs = require('fs')
+const fs = require("fs");
 
-const API_BASE_URL = 'http://localhost:3000/api'
+const API_BASE_URL = "http://localhost:3000/api";
 
 async function importData(endpoint, dataFile) {
   try {
-    const data = JSON.parse(fs.readFileSync(dataFile, 'utf8'))
-    
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    })
+    const data = JSON.parse(fs.readFileSync(dataFile, "utf8"));
 
-    const result = await response.json()
-    console.log(`Import results for ${endpoint}:`, result)
-    
-    return result
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    console.log(`Import results for ${endpoint}:`, result);
+
+    return result;
   } catch (error) {
-    console.error(`Error importing ${endpoint}:`, error)
+    console.error(`Error importing ${endpoint}:`, error);
   }
 }
 
 async function runBulkImport() {
-  console.log('Starting bulk import...')
-  
+  console.log("Starting bulk import...");
+
   // Import in order: brands -> categories -> products
-  await importData('/brands', './sample-brands.json')
-  await importData('/categories', './sample-categories.json') 
-  await importData('/products/bulk', './sample-products.json')
-  
-  console.log('Bulk import completed!')
+  await importData("/brands", "./sample-brands.json");
+  await importData("/categories", "./sample-categories.json");
+  await importData("/products/bulk", "./sample-products.json");
+
+  console.log("Bulk import completed!");
 }
 
-runBulkImport()
+runBulkImport();
 ```
 
 ### Python Import Script
@@ -291,24 +284,24 @@ def import_data(endpoint, data_file):
     try:
         with open(data_file, 'r') as f:
             data = json.load(f)
-        
+
         response = requests.post(f'{API_BASE_URL}{endpoint}', json=data)
         result = response.json()
-        
+
         print(f'Import results for {endpoint}: {result}')
         return result
-        
+
     except Exception as e:
         print(f'Error importing {endpoint}: {e}')
 
 def run_bulk_import():
     print('Starting bulk import...')
-    
+
     # Import in order: brands -> categories -> products
     import_data('/brands', './sample-brands.json')
     import_data('/categories', './sample-categories.json')
     import_data('/products/bulk', './sample-products.json')
-    
+
     print('Bulk import completed!')
 
 if __name__ == '__main__':
@@ -320,6 +313,7 @@ if __name__ == '__main__':
 1. **Save sample data** to JSON files (e.g., `sample-products.json`)
 2. **Start your Next.js server**: `npm run dev`
 3. **Run the import script**:
+
    ```bash
    node bulk-import.js
    # or
@@ -333,6 +327,7 @@ if __name__ == '__main__':
 ## Data Validation
 
 The API validates all input data:
+
 - **Required fields**: name, price, brandName, categoryName
 - **Data types**: numbers for price/stock, arrays for features/images
 - **Constraints**: positive prices, valid URLs
@@ -341,20 +336,20 @@ The API validates all input data:
 ## Error Handling
 
 Import results include:
+
 - `success`: Number of successful imports
-- `failed`: Number of failed imports  
+- `failed`: Number of failed imports
 - `errors`: Array of error messages
 
 Example response:
+
 ```json
 {
   "message": "Bulk import completed",
   "results": {
     "success": 4,
-    "failed": 1, 
-    "errors": [
-      "Failed to create product 'Invalid Product': Price must be positive"
-    ]
+    "failed": 1,
+    "errors": ["Failed to create product 'Invalid Product': Price must be positive"]
   }
 }
 ```

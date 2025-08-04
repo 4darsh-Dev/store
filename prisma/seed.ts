@@ -45,7 +45,7 @@ async function main() {
       data: {
         name: "Electronics",
         url: "electronics",
-        iconUrl: "/categories/electronics.svg",
+        iconUrl: "/computerIcon.svg",
         iconSize: [24, 24],
       },
     });
@@ -53,7 +53,7 @@ async function main() {
       data: {
         name: "Smartphones",
         url: "smartphones",
-        iconUrl: "/categories/smartphones.svg",
+        iconUrl: "/phoneIcon.svg",
         iconSize: [24, 24],
       },
     });
@@ -61,7 +61,7 @@ async function main() {
       data: {
         name: "Laptops",
         url: "laptops",
-        iconUrl: "/categories/laptops.svg",
+        iconUrl: "/computerIcon.svg",
         iconSize: [24, 24],
       },
     });
@@ -69,7 +69,7 @@ async function main() {
       data: {
         name: "Shoes",
         url: "shoes",
-        iconUrl: "/categories/shoes.svg",
+        iconUrl: "/otherCatIcon.svg",
         iconSize: [24, 24],
       },
     });

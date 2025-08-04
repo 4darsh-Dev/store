@@ -21,7 +21,7 @@ const CategoryListItem = ({ categoryData, className }: TProps) => {
       <Link href={"/list/" + group.url} className="text-gray-700 transition-colors duration-300 hover:text-gray-900">
         <div className="w-7 inline-block">
           <Image
-            src={"/icons/" + group.iconUrl + ".svg"}
+            src={"/icons" + group.iconUrl}
             alt={group.name}
             width={group.iconSize[0]}
             height={group.iconSize[1]}
