@@ -12,6 +12,17 @@ import NavBarFavorite from "./navFavorite";
 import NavBarProfile from "./navProfile";
 import NavBarShopping from "./navShopping";
 
+import axios from "axios";
+
+type SearchProduct = {
+  id: string;
+  name: string;
+  brand?: { name?: string };
+  // add other fields as needed
+};
+
+
+
 const NAVBAR_ITEMS = [
   { name: "Computer", link: "/list/pc-laptops/computer" },
   { name: "Laptop", link: "/list/pc-laptops/laptops" },
@@ -25,6 +36,28 @@ const NAVBAR_ITEMS = [
 
 const StoreNavBar = () => {
   const [hideNavbar, setHideNavbar] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSearchChange = async (e : React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setSearchQuery(value);
+
+  if (value.length > 2) { // Only search if query is long enough
+    setIsLoading(true);
+    try {
+      const res = await axios.get(`/api/search?q=${encodeURIComponent(value)}&limit=100`);
+      setSearchResults(res.data.products);
+    } catch (err) {
+      setSearchResults([]);
+    }
+    setIsLoading(false);
+  } else {
+    setSearchResults([]);
+  }
+};
+
 
   useEffect(() => {
     let prevPositionY = 0;
@@ -62,9 +95,23 @@ const StoreNavBar = () => {
           <div className="h-11 relative flex-1 mx-6 sm:mx-10">
             <input
               type="text"
+              value={searchQuery}
               className="text-gray-800 hidden sm:block pl-4 size-full border-gray-300 focus:border-gray-500 border rounded-lg outline-gray-500 sm:pl-12"
               placeholder="Search"
+              onChange={handleSearchChange}
             />
+            {searchResults.length > 0 && (
+            <div className="absolute left-0 right-0 top-full bg-white shadow-lg rounded-lg z-50">
+              {searchResults.map(product => (
+                <div key={product.id} className="p-2 hover:bg-gray-100 cursor-pointer">
+                  <Link href={`/product/${product.id}`}>
+                    <span>{product.name}</span>
+                    <span className="text-xs text-gray-500">{product.brand?.name}</span>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
             <Image
               src="/icons/searchIcon.svg"
               width={16}

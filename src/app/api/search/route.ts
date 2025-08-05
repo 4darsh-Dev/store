@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       where.OR = [
         { name: { contains: query, mode: "insensitive" } },
         { desc: { contains: query, mode: "insensitive" } },
-        { searchVector: { contains: query, mode: "insensitive" } },
         { specialFeatures: { hasSome: [query] } },
         { brand: { name: { contains: query, mode: "insensitive" } } },
         { category: { name: { contains: query, mode: "insensitive" } } },
@@ -206,7 +205,6 @@ export async function POST(request: NextRequest) {
       where.OR = [
         { name: { contains: query, mode: "insensitive" } },
         { desc: { contains: query, mode: "insensitive" } },
-        { searchVector: { contains: query, mode: "insensitive" } },
         { brand: { name: { contains: query, mode: "insensitive" } } },
         { category: { name: { contains: query, mode: "insensitive" } } },
       ];
