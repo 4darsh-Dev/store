@@ -1,9 +1,14 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { WEBSOCKET_URL } from "../utils/constants.js";
-
+import { useRouter } from "next/navigation.js";
+import { nav } from "framer-motion/client";
+import { add, shoppingCartStore } from "@/store/shoppingCart";
+import { addToCart, navigateToProduct, navigateToSearch } from "@/components/utils/commandUtils.js";
 export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, timestamps, setTimestamps }) => {
   const [wsStatus, setWsStatus] = useState("disconnected");
   const wsRef = useRef(null);
+  const router = useRouter();
+
   const connectWebSocket = useCallback(() => {
     return new Promise((resolve, reject) => {
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -91,6 +96,38 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
             console.log("🛑 Audio interrupt received");
             onMessage?.(message);
             onResetTimestamps?.();
+          } else if (message.type === "command") {
+            console.log("🔄 got command message");
+            onResetTimestamps?.();
+            if (message.command === "navigate_to_search") {
+              console.log("Navigating to search page");
+              // Implement navigation logic here
+              const query = message.search_query || "";
+              if (!query) {
+                console.warn("No search query provided in command message.");
+              }
+              navigateToSearch(query, router);
+            } else if (message.command === "add_to_cart") {
+              console.log("Adding to cart");
+              // Implement add to cart logic here
+              const product_id = message.product_id || "";
+              const quantity = message.quantity || 1;
+              if (!product_id) {
+                console.warn("No product ID provided in command message.");
+              }
+              if (quantity <= 0) {
+                console.warn("Invalid quantity provided in command message.");
+              }
+              addToCart(product_id, quantity, shoppingCartStore, add);
+            } else if (message.command === "navigate_to_product") {
+              console.log("Navigating to product page");
+              // Implement navigation logic here
+              const product_id = message.product_id || "";
+              if (!product_id) {
+                console.warn("No product ID provided in command message.");
+              }
+              navigateToProduct(product_id, router);
+            }
           }
         } catch (e) {
           console.error("WebSocket message error:", e);

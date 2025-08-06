@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { getCartProducts } from "@/actions/product/product";
 import { CloseIcon, ShoppingIconEmpty } from "@/shared/components/icons/svgIcons";
@@ -9,7 +9,7 @@ import Button from "@/shared/components/UI/button";
 import { TCartListItemDB } from "@/shared/types/product";
 import { TCartItemData } from "@/shared/types/shoppingCart";
 import { cn } from "@/shared/utils/styling";
-import { RootState } from "@/store/shoppingCart";
+import { clear, RootState } from "@/store/shoppingCart";
 
 import CartItem from "./_components/cartItem";
 
@@ -23,6 +23,7 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
   const [cartItems, setCartItems] = useState<TCartItemData[]>();
   const localCartItems = useSelector((state: RootState) => state.cart);
 
+  const dispatch = useDispatch();
   useEffect(() => {
     const convertDBtoCartItems = (rawData: TCartListItemDB[]) => {
       const cartListItem: TCartItemData[] = [];
@@ -40,8 +41,9 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
       return null;
     };
     const getProductsFromDB = async () => {
+      console.log("Getting products from cart");
       const productsIDs = localCartItems.items.map((s) => s.productId);
-
+      console.log("Products IDs:", productsIDs);
       if (productsIDs?.length === 0) setCartItems([]);
 
       if (productsIDs) {
@@ -60,7 +62,9 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
       getProductsFromDB();
     }
   }, [localCartItems]);
-
+  const handleCartClear = () => {
+    dispatch(clear());
+  };
   return (
     <div
       className={cn(
@@ -99,6 +103,14 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
               CHECKOUT
             </Button>
           )}
+
+          <Button
+            onClick={handleCartClear}
+            className="text-gray-500 text-sm w-4/5 border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
+          >
+            Clear Cart
+          </Button>
+
           <Button
             onClick={handleOnClose}
             className="text-gray-500 text-sm w-4/5 border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
