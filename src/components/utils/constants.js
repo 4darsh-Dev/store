@@ -1,5 +1,5 @@
-export const WEBSOCKET_URL ='wss://csr-backend-gtadhjfuhkgqcahb.centralindia-01.azurewebsites.net/ws/audio'
-// export const WEBSOCKET_URL = 'ws://localhost:8000/ws/audio'
+// export const WEBSOCKET_URL ='wss://csr-backend-gtadhjfuhkgqcahb.centralindia-01.azurewebsites.net/ws/audio'
+export const WEBSOCKET_URL = 'ws://localhost:8000/ws/audio'
 
 export const AUDIO_CONFIG = {
   RECORDING: {

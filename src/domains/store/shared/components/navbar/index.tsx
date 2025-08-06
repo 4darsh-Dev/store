@@ -49,6 +49,9 @@ const StoreNavBar = () => {
     try {
       const res = await axios.get(`/api/search?q=${encodeURIComponent(value)}&limit=100`);
       setSearchResults(res.data.products);
+
+      console.log("Search results:", res.data.products);
+      
     } catch (err) {
       setSearchResults([]);
     }

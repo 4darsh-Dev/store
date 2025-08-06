@@ -135,7 +135,7 @@ export const VoiceInterface = ({
   )}
 
 
-        <div className='absolute inset-0 bg-gradient-to-b from-black via-black to-[#290e74]' />
+        <div className='absolute inset-0 bg-transparent ' />
 
         <div className='text-center text-white z-10 relative'>
           <div
@@ -157,7 +157,7 @@ export const VoiceInterface = ({
       {/* Overlay Animation */}
       {stage !== 'done' && (
         <div
-          className='absolute inset-0 z-10 flex items-center justify-center  bg-gradient-to-b from-black via-black to-[#290e74]'
+          className='absolute inset-0 z-10 flex items-center justify-center bg-transparent' 
           // initial='hidden'
           // animate={overlayControls}
           // variants={{
