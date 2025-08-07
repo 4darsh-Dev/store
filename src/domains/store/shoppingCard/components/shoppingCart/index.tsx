@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { getCartProducts } from "@/actions/product/product";
 import { CloseIcon, ShoppingIconEmpty } from "@/shared/components/icons/svgIcons";
@@ -9,9 +9,10 @@ import Button from "@/shared/components/UI/button";
 import { TCartListItemDB } from "@/shared/types/product";
 import { TCartItemData } from "@/shared/types/shoppingCart";
 import { cn } from "@/shared/utils/styling";
-import { RootState } from "@/store/shoppingCart";
+import { clear, RootState } from "@/store/shoppingCart";
 
 import CartItem from "./_components/cartItem";
+import Link from "next/link";
 
 type TProps = {
   isVisible: boolean;
@@ -23,6 +24,7 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
   const [cartItems, setCartItems] = useState<TCartItemData[]>();
   const localCartItems = useSelector((state: RootState) => state.cart);
 
+  const dispatch = useDispatch();
   useEffect(() => {
     const convertDBtoCartItems = (rawData: TCartListItemDB[]) => {
       const cartListItem: TCartItemData[] = [];
@@ -40,8 +42,9 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
       return null;
     };
     const getProductsFromDB = async () => {
+      console.log("Getting products from cart");
       const productsIDs = localCartItems.items.map((s) => s.productId);
-
+      console.log("Products IDs:", productsIDs);
       if (productsIDs?.length === 0) setCartItems([]);
 
       if (productsIDs) {
@@ -60,7 +63,9 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
       getProductsFromDB();
     }
   }, [localCartItems]);
-
+  const handleCartClear = () => {
+    dispatch(clear());
+  };
   return (
     <div
       className={cn(
@@ -95,16 +100,28 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-white border-t border-gray-300 flex flex-col items-center justify-center gap-4 mx-6">
           {!!cartItems?.length && (
-            <Button className="w-4/5 text-sm font-semibold text-green-700 border-green-300 bg-green-50">
+            <Link
+              className="w-4/5 text-sm font-semibold text-green-700 border-green-300 bg-green-50 flex items-center justify-center"
+              href="/checkout"
+            >
               CHECKOUT
-            </Button>
+            </Link>
           )}
-          <Button
-            onClick={handleOnClose}
-            className="text-gray-500 text-sm w-4/5 border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
-          >
-            Back to Shop
-          </Button>
+          <div className="flex items-center justify-between w-4/5">
+            <Button
+              onClick={handleCartClear}
+              className="text-gray-500 text-sm  border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
+            >
+              Clear Cart
+            </Button>
+
+            <Button
+              onClick={handleOnClose}
+              className="text-gray-500 text-sm  border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
+            >
+              Back to Shop
+            </Button>
+          </div>
         </div>
       </div>
     </div>

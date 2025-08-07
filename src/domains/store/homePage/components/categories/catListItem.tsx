@@ -18,16 +18,14 @@ const CategoryListItem = ({ categoryData, className }: TProps) => {
         className
       )}
     >
-      <Link href={"/list/" + group.url} className="text-gray-700 transition-colors duration-300 hover:text-gray-900">
+      <Link
+        href={"/list/" + group.url}
+        className="flex items-center gap-2 text-gray-700 transition-colors duration-300 hover:text-gray-900"
+      >
         <div className="w-7 inline-block">
-          <Image
-            src={"/icons" + group.iconUrl}
-            alt={group.name}
-            width={group.iconSize[0]}
-            height={group.iconSize[1]}
-          />
+          <Image src={"/icons" + group.iconUrl} alt={group.name} width={group.iconSize[0]} height={group.iconSize[1]} />
         </div>
-        {group.name}
+        <div className="text-sm">{group.name}</div>
       </Link>
       <div>
         {categories && categories.length > 0 && (
