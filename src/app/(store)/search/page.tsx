@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import ProductCard from "@/domains/product/components/productCard";
@@ -19,8 +19,7 @@ import { cn } from "@/shared/utils/styling";
 
 const SearchPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const query = searchParams.get("query") || "";
+  const [query, setQuery] = useState<string | null>("");
 
   const [productList, setProductList] = useState<TListItem[]>([]);
   const [sortIndex, setSortIndex] = useState(0);
@@ -33,10 +32,14 @@ const SearchPage = () => {
   });
 
   const [isSearchLoading, setIsSearchLoading] = useState(true);
-
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("query");
+    setQuery(query);
+  }, []);
   useEffect(() => {
     const searchProducts = async () => {
-      if (!query.trim()) {
+      if (query && !query.trim()) {
         setProductList([]);
         setIsSearchLoading(false);
         return;
@@ -45,6 +48,9 @@ const SearchPage = () => {
       setIsSearchLoading(true);
 
       try {
+        if (!query || query.trim() === "") {
+          return;
+        }
         const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=100`);
         const data = await response.json();
 
