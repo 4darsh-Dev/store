@@ -21,7 +21,7 @@ export const HomeCategoryList = () => {
   }, []);
 
   return (
-    <div className="min-w-[256px] absolute h-[500px] hidden lg:block bg-white mr-4 rounded-xl px-6 text-gray-800 shadow-md z-[3]">
+    <div className="min-w-[256px] absolute h-[500px] hidden lg:block bg-white mr-4 rounded-xl px-6 text-gray-800 shadow-md z-[3] overflow-hidden">
       <ul className="mt-3">
         {!categories || categories.length === 0 ? (
           <div className="flex flex-col gap-7 justify-center mt-5">{Skeletons()}</div>

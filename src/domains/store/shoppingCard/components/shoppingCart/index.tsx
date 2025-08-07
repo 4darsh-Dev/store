@@ -12,6 +12,7 @@ import { cn } from "@/shared/utils/styling";
 import { clear, RootState } from "@/store/shoppingCart";
 
 import CartItem from "./_components/cartItem";
+import Link from "next/link";
 
 type TProps = {
   isVisible: boolean;
@@ -99,24 +100,28 @@ const ShoppingCart = ({ isVisible, quantity, handleOnClose }: TProps) => {
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-white border-t border-gray-300 flex flex-col items-center justify-center gap-4 mx-6">
           {!!cartItems?.length && (
-            <Button className="w-4/5 text-sm font-semibold text-green-700 border-green-300 bg-green-50">
+            <Link
+              className="w-4/5 text-sm font-semibold text-green-700 border-green-300 bg-green-50 flex items-center justify-center"
+              href="/checkout"
+            >
               CHECKOUT
-            </Button>
+            </Link>
           )}
+          <div className="flex items-center justify-between w-4/5">
+            <Button
+              onClick={handleCartClear}
+              className="text-gray-500 text-sm  border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
+            >
+              Clear Cart
+            </Button>
 
-          <Button
-            onClick={handleCartClear}
-            className="text-gray-500 text-sm w-4/5 border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
-          >
-            Clear Cart
-          </Button>
-
-          <Button
-            onClick={handleOnClose}
-            className="text-gray-500 text-sm w-4/5 border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
-          >
-            Back to Shop
-          </Button>
+            <Button
+              onClick={handleOnClose}
+              className="text-gray-500 text-sm  border-gray-300 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 active:border-gray-500 active:bg-gray-300"
+            >
+              Back to Shop
+            </Button>
+          </div>
         </div>
       </div>
     </div>

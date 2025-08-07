@@ -3,7 +3,7 @@ import { WEBSOCKET_URL } from "../utils/constants.js";
 import { useRouter } from "next/navigation.js";
 import { nav } from "framer-motion/client";
 import { add, shoppingCartStore } from "@/store/shoppingCart";
-import { addToCart, navigateToProduct, navigateToSearch } from "@/components/utils/commandUtils.js";
+import { addToCart, buyNow, navigateToProduct, navigateToSearch } from "@/components/utils/commandUtils.js";
 export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, timestamps, setTimestamps }) => {
   const [wsStatus, setWsStatus] = useState("disconnected");
   const wsRef = useRef(null);
@@ -97,7 +97,7 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
             onMessage?.(message);
             onResetTimestamps?.();
           } else if (message.type === "command") {
-            console.log("🔄 got command message");
+            console.log("🔄 got command message, type:", message.command);
             onResetTimestamps?.();
             if (message.command === "navigate_to_search") {
               console.log("Navigating to search page");
@@ -106,7 +106,7 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
               if (!query) {
                 console.warn("No search query provided in command message.");
               }
-              navigateToSearch(query, router);
+              navigateToSearch(query, router, wsRef.current);
             } else if (message.command === "add_to_cart") {
               console.log("Adding to cart");
               // Implement add to cart logic here
@@ -118,7 +118,7 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
               if (quantity <= 0) {
                 console.warn("Invalid quantity provided in command message.");
               }
-              addToCart(product_id, quantity, shoppingCartStore, add);
+              addToCart(product_id, quantity, shoppingCartStore);
             } else if (message.command === "navigate_to_product") {
               console.log("Navigating to product page");
               // Implement navigation logic here
@@ -127,6 +127,18 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
                 console.warn("No product ID provided in command message.");
               }
               navigateToProduct(product_id, router);
+            } else if (message.command === "buy_now") {
+              console.log("Navigating to checkout page");
+              // Implement navigation logic here
+              const product_id = message.product_id || "";
+              const quantity = message.quantity || 1;
+              if (!product_id) {
+                console.warn("No product ID provided in command message.");
+              }
+              if (quantity <= 0) {
+                console.warn("Invalid quantity provided in command message.");
+              }
+              buyNow(product_id, quantity, shoppingCartStore, router);
             }
           }
         } catch (e) {
