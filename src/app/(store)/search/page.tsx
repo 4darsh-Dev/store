@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import ProductCard from "@/domains/product/components/productCard";
@@ -20,7 +20,7 @@ import { cn } from "@/shared/utils/styling";
 const SearchPage = () => {
   const router = useRouter();
   const [query, setQuery] = useState<string | null>("");
-
+  const pathname = usePathname();
   const [productList, setProductList] = useState<TListItem[]>([]);
   const [sortIndex, setSortIndex] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
@@ -33,10 +33,49 @@ const SearchPage = () => {
 
   const [isSearchLoading, setIsSearchLoading] = useState(true);
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const query = params.get("query");
-    setQuery(query);
+    const updateQuery = () => {
+      const params = new URLSearchParams(window.location.search);
+      const newQuery = params.get("query") || "";
+      setQuery(newQuery);
+    };
+
+    // Initial load
+    updateQuery();
+
+    // Listen for browser navigation (back/forward)
+    const handlePopState = () => {
+      updateQuery();
+    };
+
+    // Listen for programmatic navigation
+    const handleRouteChange = () => {
+      // Small delay to ensure URL is updated
+      setTimeout(updateQuery, 0);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    // For programmatic router.push() calls, we need to listen for URL changes
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    history.pushState = function (...args) {
+      originalPushState.apply(history, args);
+      handleRouteChange();
+    };
+
+    history.replaceState = function (...args) {
+      originalReplaceState.apply(history, args);
+      handleRouteChange();
+    };
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      history.pushState = originalPushState;
+      history.replaceState = originalReplaceState;
+    };
   }, []);
+
   useEffect(() => {
     const searchProducts = async () => {
       if (query && !query.trim()) {
