@@ -3,11 +3,13 @@ import { TListItem } from "@/domains/store/productList/types";
 
 export const navigateToSearch = async (query, router, ws) => {
   router.push(`/search?query=${query}`);
+  console.log("fetching search results for query:", query);
   const data = await fetchSearchResults(query);
   if (!data) {
     console.error("Failed to fetch search results");
     return;
   }
+  console.log("searchData", data);
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(
       JSON.stringify({
