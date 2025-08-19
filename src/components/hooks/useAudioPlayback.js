@@ -6,7 +6,6 @@ export function useAudioPlayback() {
   const workletNodeRef = useRef(null);
   const chunkQueue = useRef([]);
   const isPlaying = useRef(false);
-  const [recordedChunks, setRecordedChunks] = useState([]);
   const isWorkletConnected = useRef(false);
 
   // Function to create and connect the AudioContext and WorkletNode
@@ -136,8 +135,6 @@ export function useAudioPlayback() {
       console.warn("[AudioPlayback] Invalid input: not a Float32Array.");
       return;
     }
-
-    setRecordedChunks((prev) => [...prev, pcmFloat32Array]);
     // Split the large array into smaller chunks
     const chunkSize = 4096;
     for (let i = 0; i < pcmFloat32Array.length; i += chunkSize) {
@@ -173,48 +170,6 @@ export function useAudioPlayback() {
     // console.log("[AudioPlayback] Decoded base64 to Int16Array of length:", int16.length);
     return int16ToFloat32(int16);
   };
-  const saveRecordedAudio = () => {
-    if (recordedChunks.length === 0) {
-      console.warn("No audio data to save.");
-      return;
-    }
 
-    // Combine all chunks into a single Float32Array
-    const totalLength = recordedChunks.reduce((acc, chunk) => acc + chunk.length, 0);
-    const combinedData = new Float32Array(totalLength);
-    let offset = 0;
-    for (const chunk of recordedChunks) {
-      combinedData.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    // Convert Float32 to Int16
-    const int16Data = new Int16Array(combinedData.length);
-    for (let i = 0; i < combinedData.length; i++) {
-      int16Data[i] = Math.max(-1, Math.min(1, combinedData[i])) * 32767;
-    }
-
-    // Create a Blob from the raw Int16Array
-    const rawBlob = new Blob([int16Data], { type: "application/octet-stream" });
-
-    // Create a temporary URL for the Blob
-    const url = URL.createObjectURL(rawBlob);
-
-    // Create a temporary anchor element to trigger the download
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = `audio_${Date.now()}.raw`;
-
-    // Append the anchor to the body, click it, and then remove it
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
-
-    console.log("Audio file prepared for download.");
-    setRecordedChunks([]);
-  };
-
-  return { interruptAudio, setupAudio, playPCMChunk, int16ToFloat32, base64PCMToFloat32, saveRecordedAudio };
+  return { interruptAudio, setupAudio, playPCMChunk, int16ToFloat32, base64PCMToFloat32 };
 }

@@ -11,7 +11,7 @@ export const useVoiceCall = () => {
   const { timestamps, metrics, resetTimestamps, updateTimestamp, calculateMetrics, setTimestamps } =
     usePerformanceMetrics();
 
-  const { interruptAudio, setupAudio, playPCMChunk, base64PCMToFloat32, saveRecordedAudio } = useAudioPlayback();
+  const { interruptAudio, setupAudio, playPCMChunk, base64PCMToFloat32 } = useAudioPlayback();
 
   const handleWebSocketMessage = useCallback(
     async (message) => {
@@ -128,6 +128,5 @@ export const useVoiceCall = () => {
 
     // WebSocket
     wsRef,
-    saveRecordedAudio,
   };
 };

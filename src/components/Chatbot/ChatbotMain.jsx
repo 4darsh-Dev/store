@@ -3,7 +3,7 @@ import { VoiceInterface } from "./VoiceInterface.jsx";
 import { useVoiceCall } from "../hooks/useVoiceCall.js";
 
 const ChatbotMain = () => {
-  const { wsStatus, startCall, stopCall, wsRef, saveRecordedAudio } = useVoiceCall();
+  const { wsStatus, startCall, stopCall, wsRef } = useVoiceCall();
 
   return (
     <div
@@ -24,7 +24,6 @@ const ChatbotMain = () => {
       }}
     >
       <VoiceInterface onStartCall={startCall} onStopCall={stopCall} wsStatus={wsStatus} stage="idle" wsRef={wsRef} />
-      <button onClick={saveRecordedAudio}>Save audio</button>
     </div>
   );
 };
