@@ -11,7 +11,7 @@ export const useVoiceCall = () => {
   const { timestamps, metrics, resetTimestamps, updateTimestamp, calculateMetrics, setTimestamps } =
     usePerformanceMetrics();
 
-  const { interruptAudio, setupAudio, playPCMChunk, base64PCMToFloat32 } = useAudioPlayback();
+  const { interruptAudio, setupAudio, playPCMChunk, base64PCMToFloat32, disconnectAudio } = useAudioPlayback();
 
   const handleWebSocketMessage = useCallback(
     async (message) => {
@@ -108,8 +108,9 @@ export const useVoiceCall = () => {
     if (callStatus !== "idle") {
       setCallStatus("idle");
     }
+    disconnectAudio();
     console.log("Call stopped successfully!");
-  }, [wsRef, stopRecording, disconnectWebSocket, recordingStatus, callStatus]);
+  }, [wsRef, stopRecording, disconnectWebSocket, recordingStatus, callStatus, disconnectAudio]);
 
   return {
     // States

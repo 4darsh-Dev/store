@@ -171,5 +171,58 @@ export function useAudioPlayback() {
     return int16ToFloat32(int16);
   };
 
-  return { interruptAudio, setupAudio, playPCMChunk, int16ToFloat32, base64PCMToFloat32 };
+  const disconnectAudio = useCallback(() => {
+    console.log("[AudioPlayback] Disconnecting audio due to call cut.");
+
+    try {
+      // Stop any ongoing playback immediately
+      isPlaying.current = false;
+
+      // Clear all queued chunks
+      chunkQueue.current = [];
+
+      // Disconnect and clean up worklet node
+      if (workletNodeRef.current) {
+        try {
+          workletNodeRef.current.disconnect();
+          workletNodeRef.current.port.onmessage = null; // Remove message handler
+        } catch (e) {
+          console.warn("[AudioPlayback] Error disconnecting worklet:", e);
+        }
+        workletNodeRef.current = null;
+      }
+
+      // Update connection status
+      isWorkletConnected.current = false;
+
+      // Close and clean up audio context
+      if (audioContextRef.current) {
+        // Close the audio context (this will clean up all associated resources)
+        audioContextRef.current
+          .close()
+          .then(() => {
+            console.log("[AudioPlayback] AudioContext closed successfully.");
+          })
+          .catch((e) => {
+            console.warn("[AudioPlayback] Error closing AudioContext:", e);
+          });
+
+        audioContextRef.current = null;
+      }
+
+      console.log("[AudioPlayback] Audio disconnected and resources cleaned up.");
+    } catch (error) {
+      console.error("[AudioPlayback] Error during audio disconnection:", error);
+    }
+  }, []);
+
+  // Enhanced cleanup for unmount
+  useEffect(() => {
+    return () => {
+      console.log("[AudioPlayback] Cleanup on unmount.");
+      disconnectAudio();
+    };
+  }, [disconnectAudio]);
+
+  return { interruptAudio, setupAudio, playPCMChunk, int16ToFloat32, base64PCMToFloat32, disconnectAudio };
 }
