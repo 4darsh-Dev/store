@@ -13,7 +13,6 @@ export const useAudioRecording = () => {
         console.warn("WebSocket not ready for recording");
         return;
       }
-
       if (recordingStatus === "recording") {
         console.log("Already recording.");
         return;

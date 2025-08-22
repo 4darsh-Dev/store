@@ -76,7 +76,7 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
             onTimestampUpdate("ttsStart", now);
             console.log(`🗣️ TTS processing started at: ${now}ms`);
           } else if (message.type === "audio_chunk") {
-            console.log(`🎵 Audio chunk received at: ${now}ms for task ${message.task_id}`);
+            // console.log(`🎵 Audio chunk received at: ${now}ms for task ${message.task_id}`);
 
             setTimestamps((prev) => {
               if (!prev.firstAudioChunk) {

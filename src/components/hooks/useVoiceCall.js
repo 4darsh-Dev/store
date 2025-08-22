@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+"use client";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useWebSocket } from "./useWebSocket.js";
 import { useAudioRecording } from "./useAudioRecording.js";
 import { useAudioPlayback } from "./useAudioPlayback.js";
@@ -10,23 +11,21 @@ export const useVoiceCall = () => {
   const { timestamps, metrics, resetTimestamps, updateTimestamp, calculateMetrics, setTimestamps } =
     usePerformanceMetrics();
 
-  const { stopCurrentAudio, playMP3AudioChunk, isAiSpeaking } = useAudioPlayback({
-    onTimestampUpdate: updateTimestamp,
-    onCalculateMetrics: calculateMetrics,
-  });
+  const { interruptAudio, setupAudio, playPCMChunk, base64PCMToFloat32, disconnectAudio } = useAudioPlayback();
 
   const handleWebSocketMessage = useCallback(
-    (message) => {
+    async (message) => {
       if (message.type === "utterance_end") {
         setSttTranscript(message.response);
       } else if (message.type === "audio_chunk" && message.data) {
-        playMP3AudioChunk(message.data);
+        playPCMChunk(base64PCMToFloat32(message.data));
       } else if (message.type === "audio_interrupt") {
+        interruptAudio();
         console.log("🛑 Audio interrupt received");
-        stopCurrentAudio();
+        // stopCurrentAudio();
       }
     },
-    [playMP3AudioChunk, stopCurrentAudio]
+    [playPCMChunk, base64PCMToFloat32, interruptAudio]
   );
 
   const handleFirstAudioChunk = useCallback(
@@ -54,18 +53,16 @@ export const useVoiceCall = () => {
   const { micStatus, recordingStatus, startRecording, stopRecording } = useAudioRecording();
 
   useEffect(() => {
-    console.log(isAiSpeaking, "ai speak");
-    if (isAiSpeaking === false) {
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(
-          JSON.stringify({
-            type: "audio_playback_end",
-          })
-        );
-        console.log("Sent audio_playback_end signal to backend.");
-      }
+    // console.log(isAiSpeaking, "ai speak");
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: "audio_playback_end",
+        })
+      );
+      console.log("Sent audio_playback_end signal to backend.");
     }
-  }, [isAiSpeaking, wsRef]);
+  }, [wsRef]);
 
   const startCall = useCallback(async () => {
     if (callStatus === "connecting" || callStatus === "connected") {
@@ -86,7 +83,7 @@ export const useVoiceCall = () => {
         console.log("Starting recording...");
         await startRecording(wsRef.current);
       }
-
+      await setupAudio();
       setCallStatus("connected");
       console.log("Call started successfully!");
       return true;
@@ -98,7 +95,7 @@ export const useVoiceCall = () => {
     }
   }, [callStatus, wsRef, connectWebSocket, recordingStatus, startRecording]);
 
-  const stopCall = useCallback(() => {
+  const stopCall = useCallback(async () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       disconnectWebSocket();
     } else {
@@ -111,8 +108,9 @@ export const useVoiceCall = () => {
     if (callStatus !== "idle") {
       setCallStatus("idle");
     }
+    disconnectAudio();
     console.log("Call stopped successfully!");
-  }, [wsRef, stopRecording, disconnectWebSocket, recordingStatus, callStatus]);
+  }, [wsRef, stopRecording, disconnectWebSocket, recordingStatus, callStatus, disconnectAudio]);
 
   return {
     // States
