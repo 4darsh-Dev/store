@@ -4,6 +4,7 @@ import { useWebSocket } from "./useWebSocket.js";
 import { useAudioRecording } from "./useAudioRecording.js";
 import { useAudioPlayback } from "./useAudioPlayback.js";
 import { usePerformanceMetrics } from "./usePerformanceMetrics.js";
+import { logger } from "../utils/logger.js";
 
 export const useVoiceCall = () => {
   const [callStatus, setCallStatus] = useState("idle");
@@ -11,18 +12,90 @@ export const useVoiceCall = () => {
   const { timestamps, metrics, resetTimestamps, updateTimestamp, calculateMetrics, setTimestamps } =
     usePerformanceMetrics();
 
-  const { interruptAudio, setupAudio, playPCMChunk, base64PCMToFloat32, disconnectAudio } = useAudioPlayback();
+  const {
+    interruptAudio,
+    setupAudio,
+    playPCMChunk,
+    base64PCMToFloat32,
+    binaryPCMToFloat32,
+    disconnectAudio,
+    decodeOpusPacket,
+    saveRawOpusData,
+    startAudioCollection,
+    processDecodedChunks,
+  } = useAudioPlayback();
 
   const handleWebSocketMessage = useCallback(
     async (message) => {
       if (message.type === "utterance_end") {
         setSttTranscript(message.response);
+      }
+      // logger.log('Processing message in useVoiceCall:', message)
+      if (message instanceof ArrayBuffer) {
+        logger.log("🎵 Received binary audio data:", message.byteLength, "bytes");
+        // const float32Audio = binaryPCMToFloat32(message)
+        // playPCMChunk(float32Audio)
+        return;
+      }
+      // Handle Blob data
+      if (message instanceof Blob) {
+        logger.log("🎵 Received blob audio data:", message.size, "bytes");
+        // const arrayBuffer = await message.arrayBuffer()
+        // const float32 = binaryPCMToFloat32(arrayBuffer)
+        // playPCMChunk(float32)
+
+        // opus
+        const float32Audio = decodeOpusPacket(message);
+        processDecodedChunks(float32Audio);
+        // saveRawOpusData(message, 'received-opus-data')
+        return;
+      }
+      // Handle different message formats from the backend
+      if (message.type === "transcription_response") {
+        // Handle user speech transcription from your backend
+        const transcript = message.response;
+        logger.log("📝 Found transcription_response (user speech):", transcript);
+        if (transcript) {
+          setSttTranscript(transcript);
+          const newEntry = {
+            id: Date.now() + Math.random(),
+            text: transcript,
+            timestamp: new Date().toLocaleTimeString(),
+            type: "user",
+          };
+          logger.log("📝 Adding user message to conversation history:", newEntry);
+        }
+      } else if (message.type === "ai_response") {
+        // Handle AI response from your backend
+        const aiResponse = message.response;
+        logger.log("🤖 Found ai_response:", aiResponse);
+        if (aiResponse) {
+          const newEntry = {
+            id: Date.now() + Math.random(),
+            text: aiResponse,
+            timestamp: new Date().toLocaleTimeString(),
+            type: "ai",
+          };
+          logger.log("🤖 Adding AI message to conversation history:", newEntry);
+        }
       } else if (message.type === "audio_chunk" && message.data) {
         playPCMChunk(base64PCMToFloat32(message.data));
       } else if (message.type === "audio_interrupt") {
         interruptAudio();
-        console.log("🛑 Audio interrupt received");
+        logger.log("🛑 Audio interrupt received");
         // stopCurrentAudio();
+      } else if (message.type === "error") {
+        logger.error("WebSocket error message:", message);
+        const newEntry = {
+          id: Date.now() + Math.random(),
+          text: `Error: ${message.message || JSON.stringify(message)}`,
+          timestamp: new Date().toLocaleTimeString(),
+          type: "error",
+        };
+        logger.log("❌ Adding error message to conversation history:", newEntry);
+      } else {
+        // Log unhandled message types for debugging
+        logger.log("Unhandled message type:", message.type, message);
       }
     },
     [playPCMChunk, base64PCMToFloat32, interruptAudio]
