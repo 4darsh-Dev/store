@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation.js";
 import { nav } from "framer-motion/client";
 import { add, shoppingCartStore } from "@/store/shoppingCart";
 import { addToCart, buyNow, navigateToProduct, navigateToSearch } from "@/components/utils/commandUtils.js";
+
 export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, timestamps, setTimestamps }) => {
   const [wsStatus, setWsStatus] = useState("disconnected");
   const wsRef = useRef(null);
@@ -91,10 +92,8 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
               }
               return { ...prev, lastAudioChunk: now };
             });
-            onMessage?.(message);
           } else if (message.type === "audio_interrupt") {
             console.log("🛑 Audio interrupt received");
-            onMessage?.(message);
             onResetTimestamps?.();
           } else if (message.type === "command") {
             console.log("🔄 got command message, type:", message.command);
@@ -141,6 +140,7 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
               buyNow(product_id, quantity, shoppingCartStore, router);
             }
           }
+          onMessage?.(message);
         } catch (e) {
           console.error("WebSocket message error:", e);
         }
