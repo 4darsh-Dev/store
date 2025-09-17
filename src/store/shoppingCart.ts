@@ -39,7 +39,8 @@ const cartSlice = createSlice({
       state.items.map((item) =>
         item.productId === action.payload.productId ? (item.quantity += action.payload.amount) : ""
       );
-    },clear: (state: TCartState) => {
+    },
+    clear: (state: TCartState) => {
       state.items = [];
       state.isVisible = false;
     },
@@ -50,11 +51,14 @@ export const shoppingCartStore = configureStore({
   reducer: {
     cart: cartSlice.reducer,
   },
-  preloadedState: loadState(),
+  preloadedState: typeof window !== "undefined" ? loadState() : undefined,
 });
-shoppingCartStore.subscribe(() => {
-  saveState(shoppingCartStore.getState());
-});
+
+if (typeof window !== "undefined") {
+  shoppingCartStore.subscribe(() => {
+    saveState(shoppingCartStore.getState());
+  });
+}
 
 export type RootState = ReturnType<typeof shoppingCartStore.getState>;
 export type AppDispatch = typeof shoppingCartStore.dispatch;

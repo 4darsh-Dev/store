@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Button from "@/shared/components/UI/button";
 import { cn } from "@/shared/utils/styling";
 
@@ -31,7 +32,7 @@ const PaymentPage = () => {
         <div className="flex flex-col items-center gap-4 mb-6">
           {/* Dummy QR code */}
           <div className="bg-gray-200 rounded-lg p-4">
-            <img
+            <Image
               src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=solveease@upi&pn=SolveEase&am=100"
               alt="Payment QR"
               width={180}

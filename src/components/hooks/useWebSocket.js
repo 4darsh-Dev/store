@@ -148,7 +148,7 @@ export const useWebSocket = ({ onMessage, onTimestampUpdate, onResetTimestamps, 
 
       wsRef.current = newWs;
     });
-  }, [onMessage, onTimestampUpdate, onResetTimestamps, setTimestamps]);
+  }, [onMessage, onTimestampUpdate, onResetTimestamps, setTimestamps, router]);
 
   const disconnectWebSocket = useCallback(() => {
     if (wsRef.current) {

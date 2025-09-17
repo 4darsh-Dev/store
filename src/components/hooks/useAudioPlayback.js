@@ -178,7 +178,7 @@ export function useAudioPlayback() {
 
       return monoBuffer;
     },
-    [resampleTo24kHz]
+    []
   );
 
   // Update the WebCodecs decoder configuration for raw Opus
@@ -201,6 +201,7 @@ export function useAudioPlayback() {
         };
 
         // Check if the configuration is supported
+        // eslint-disable-next-line no-undef
         const support = await AudioDecoder.isConfigSupported(config);
         if (!support.supported) {
           throw new Error(`Raw Opus codec configuration not supported: ${JSON.stringify(support)}`);
@@ -209,6 +210,7 @@ export function useAudioPlayback() {
         logger.log("[AudioPlayback] WebCodecs raw Opus config supported:", support);
 
         // Create the decoder
+        // eslint-disable-next-line no-undef
         webCodecsDecoderRef.current = new AudioDecoder({
           output: (audioData) => {
             logger.log("[AudioPlayback] WebCodecs decoded raw Opus frame:", {
@@ -380,6 +382,7 @@ export function useAudioPlayback() {
 
         try {
           // Create EncodedAudioChunk for raw Opus packet
+          // eslint-disable-next-line no-undef
           const encodedChunk = new EncodedAudioChunk({
             type: "key", // Opus packets are typically self-contained
             timestamp: performance.now() * 1000, // Current time in microseconds
@@ -523,7 +526,7 @@ export function useAudioPlayback() {
         logger.log(`[AudioPlayback] Buffering... ${bufferMs}ms/${requiredMs}ms`);
       }
     },
-    [decodeOpusPacket, saveRawOpusData, setupAudio]
+    [decodeOpusPacket, saveRawOpusData, setupAudio, base64PCMToFloat32]
   );
 
   // Process decoded chunks from WebCodecs
@@ -536,7 +539,7 @@ export function useAudioPlayback() {
         playPCMChunk(decodedChunk);
       }
     }
-  }, []);
+  }, [playPCMChunk]);
 
   // Clean up WebCodecs decoder
   const cleanupWebCodecsDecoder = useCallback(() => {
@@ -666,15 +669,15 @@ export function useAudioPlayback() {
   }, [disconnectAudio]);
 
   // Your existing utility functions remain the same
-  const int16ToFloat32 = (int16Array) => {
+  const int16ToFloat32 = useCallback((int16Array) => {
     const float32 = new Float32Array(int16Array.length);
     for (let i = 0; i < int16Array.length; i++) {
       float32[i] = int16Array[i] / 32768;
     }
     return float32;
-  };
+  }, []);
 
-  const base64PCMToFloat32 = (base64) => {
+  const base64PCMToFloat32 = useCallback((base64) => {
     const binary = atob(base64);
     const len = binary.length / 2;
     const int16 = new Int16Array(len);
@@ -682,7 +685,7 @@ export function useAudioPlayback() {
       int16[i] = (binary.charCodeAt(i * 2 + 1) << 8) | binary.charCodeAt(i * 2);
     }
     return int16ToFloat32(int16);
-  };
+  }, [int16ToFloat32]);
 
   const binaryPCMToFloat32 = (arrayBuffer) => {
     if (!(arrayBuffer instanceof ArrayBuffer)) {

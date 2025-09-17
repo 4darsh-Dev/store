@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, useAnimation } from "framer-motion";
 import Image from "next/image";
 import { ANIMATION_CONFIG } from "../utils/constants.js";
@@ -23,13 +23,13 @@ export const VoiceInterface = ({ onStartCall, onStopCall, wsStatus, stage: exter
       }
       setGreetingSent(true);
     }
-  }, [stage, controls]);
+  }, [stage, controls, greetingSent, wsRef]);
 
   useEffect(() => {
     if (wsStatus === "disconnected") {
       handleStopCall();
     }
-  }, [wsStatus]);
+  }, [wsStatus, handleStopCall]);
   const animationStart = async () => {
     setStage("animating");
 
@@ -49,14 +49,14 @@ export const VoiceInterface = ({ onStartCall, onStopCall, wsStatus, stage: exter
       animationStart();
     }
   };
-  const handleStopCall = async () => {
+  const handleStopCall = useCallback(async () => {
     onStopCall();
     setStage("idle");
     controls.start("initial");
     backgroundControls.start("normal");
     overlayControls.start("hidden");
     setGreetingSent(false);
-  };
+  }, [onStopCall, controls, backgroundControls, overlayControls]);
   return (
     <div className="h-screen w-screen relative overflow-hidden">
       {/* Main Background Content */}

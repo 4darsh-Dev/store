@@ -98,7 +98,7 @@ export const useVoiceCall = () => {
         logger.log("Unhandled message type:", message.type, message);
       }
     },
-    [playPCMChunk, base64PCMToFloat32, interruptAudio]
+    [playPCMChunk, base64PCMToFloat32, interruptAudio, decodeOpusPacket, processDecodedChunks]
   );
 
   const handleFirstAudioChunk = useCallback(
@@ -166,7 +166,7 @@ export const useVoiceCall = () => {
       alert(`Failed to start call: ${error.message}`);
       return false;
     }
-  }, [callStatus, wsRef, connectWebSocket, recordingStatus, startRecording]);
+  }, [callStatus, wsRef, connectWebSocket, recordingStatus, startRecording, setupAudio]);
 
   const stopCall = useCallback(async () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {

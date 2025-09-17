@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
+import Image from "next/image";
 import { clear, RootState } from "@/store/shoppingCart";
 import Button from "@/shared/components/UI/button";
 import { cn } from "@/shared/utils/styling";
@@ -68,7 +69,7 @@ const OrderSummaryPage = () => {
               {cartItems.map((item) => (
                 <li key={item.productId} className="flex items-center justify-between py-2 border-b border-gray-100">
                   <div className="flex items-center gap-2">
-                    <img src={item.imgUrl} alt={item.productName} width={60} height={60} />
+                    <Image src={item.imgUrl} alt={item.productName} width={60} height={60} />
                     <div>
                       <div className="font-medium text-gray-800">{item.productName}</div>
                       <div className="text-xs text-gray-500">Qty: {item.quantity}</div>
