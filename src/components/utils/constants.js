@@ -1,6 +1,6 @@
 // export const WEBSOCKET_URL ='wss://csr-backend-gtadhjfuhkgqcahb.centralindia-01.azurewebsites.net/ws/audio'
 // export const WEBSOCKET_URL = "ws://43.204.28.185/ws/audio";
-export const WEBSOCKET_URL = "ws://localhost:8000/ws/audio?tts=deepgram&agent=order";
+export const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WS_URL
 
 export const AUDIO_CONFIG = {
   RECORDING: {
