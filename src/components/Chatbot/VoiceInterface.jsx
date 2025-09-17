@@ -11,6 +11,15 @@ export const VoiceInterface = ({ onStartCall, onStopCall, wsStatus, stage: exter
   const overlayControls = useAnimation();
   const backgroundControls = useAnimation();
 
+  const handleStopCall = useCallback(async () => {
+    onStopCall();
+    setStage("idle");
+    controls.start("initial");
+    backgroundControls.start("normal");
+    overlayControls.start("hidden");
+    setGreetingSent(false);
+  }, [onStopCall, controls, backgroundControls, overlayControls]);
+
   // ✅ Start heart beat animation when component mounts and stage is idle
   useEffect(() => {
     if (stage === "idle") {
@@ -24,6 +33,8 @@ export const VoiceInterface = ({ onStartCall, onStopCall, wsStatus, stage: exter
       setGreetingSent(true);
     }
   }, [stage, controls, greetingSent, wsRef]);
+
+
 
   useEffect(() => {
     if (wsStatus === "disconnected") {
@@ -49,14 +60,7 @@ export const VoiceInterface = ({ onStartCall, onStopCall, wsStatus, stage: exter
       animationStart();
     }
   };
-  const handleStopCall = useCallback(async () => {
-    onStopCall();
-    setStage("idle");
-    controls.start("initial");
-    backgroundControls.start("normal");
-    overlayControls.start("hidden");
-    setGreetingSent(false);
-  }, [onStopCall, controls, backgroundControls, overlayControls]);
+  
   return (
     <div className="h-screen w-screen relative overflow-hidden">
       {/* Main Background Content */}

@@ -441,6 +441,25 @@ export function useAudioPlayback() {
       return { collected: true, chunkNumber: audioDebugRef.current.length };
     }
   }, []);
+
+  // Your existing utility functions remain the same
+  const int16ToFloat32 = useCallback((int16Array) => {
+    const float32 = new Float32Array(int16Array.length);
+    for (let i = 0; i < int16Array.length; i++) {
+      float32[i] = int16Array[i] / 32768;
+    }
+    return float32;
+  }, []);
+
+  const base64PCMToFloat32 = useCallback((base64) => {
+    const binary = atob(base64);
+    const len = binary.length / 2;
+    const int16 = new Int16Array(len);
+    for (let i = 0; i < len; i++) {
+      int16[i] = (binary.charCodeAt(i * 2 + 1) << 8) | binary.charCodeAt(i * 2);
+    }
+    return int16ToFloat32(int16);
+  }, [int16ToFloat32]);
   // Update playPCMChunk to handle raw Opus
   const playPCMChunk = useCallback(
     async (audioData) => {
@@ -668,24 +687,9 @@ export function useAudioPlayback() {
     };
   }, [disconnectAudio]);
 
-  // Your existing utility functions remain the same
-  const int16ToFloat32 = useCallback((int16Array) => {
-    const float32 = new Float32Array(int16Array.length);
-    for (let i = 0; i < int16Array.length; i++) {
-      float32[i] = int16Array[i] / 32768;
-    }
-    return float32;
-  }, []);
+  
 
-  const base64PCMToFloat32 = useCallback((base64) => {
-    const binary = atob(base64);
-    const len = binary.length / 2;
-    const int16 = new Int16Array(len);
-    for (let i = 0; i < len; i++) {
-      int16[i] = (binary.charCodeAt(i * 2 + 1) << 8) | binary.charCodeAt(i * 2);
-    }
-    return int16ToFloat32(int16);
-  }, [int16ToFloat32]);
+  
 
   const binaryPCMToFloat32 = (arrayBuffer) => {
     if (!(arrayBuffer instanceof ArrayBuffer)) {
